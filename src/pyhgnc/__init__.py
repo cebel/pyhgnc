@@ -24,7 +24,7 @@ __version__ = '0.0.1'
 
 __title__ = 'PyHGNC'
 __description__ = 'Importing and querying HGNC data'
-__url__ = '' # ToDo: Add URL!
+__url__ = 'https://gitlab.scai.fraunhofer.de/andrej.konotopez/pyhgnc.git'
 
 __author__ = 'Andrej Konotopez'
 __email__ = 'Andrej.Konotopez@scai.fraunhofer.de'
