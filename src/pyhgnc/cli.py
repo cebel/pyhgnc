@@ -1,4 +1,4 @@
-"""CLI for PyWikiPathways"""
+"""CLI for PyHGNC"""
 
 # -*- coding: utf-8 -*-
 

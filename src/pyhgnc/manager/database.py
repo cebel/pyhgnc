@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PyWPW loads WikiPathways contant into a relational database and provides a RESTFull API."""
+"""PyHGNC loads HGNC contant into a relational database and provides a RESTFull API."""
 
 import os
 import time
@@ -121,7 +121,7 @@ class BaseDbManager(object):
 class DbManager(BaseDbManager):
 
     def __init__(self, connection=None):
-        """The DbManager implements all function to upload CTD files into the database. Prefered SQL Alchemy
+        """The DbManager implements all function to upload HGNC data into the database. Prefered SQL Alchemy
         database is MySQL with pymysql.
 
         :param connection: custom database connection SQL Alchemy string
@@ -129,7 +129,6 @@ class DbManager(BaseDbManager):
         """
 
         super(DbManager, self).__init__(connection=connection)
-        #self.tables = get_table_configurations()
 
     def db_import(self):
         self._create_tables()
