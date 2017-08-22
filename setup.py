@@ -8,16 +8,16 @@ import codecs
 
 PACKAGES = find_packages(where='src')
 
-KEYWORDS = ['HGNC' ]
+KEYWORDS = ['HGNC', 'gene names', 'Bioinformatics' ]
 
 INSTALL_REQUIRES = [
     'sqlalchemy',
-    'pybel',
-    'pymysql'
+    'pymysql',
+    'configparser',
+    'tqdm',
+    'click',
+    'pandas'
 ]
-
-if sys.version_info < (3,):
-    INSTALL_REQUIRES.append('configparser')
 
 ENTRY_POINTS = {
     'console_scripts': [
@@ -81,7 +81,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Topic :: Database',
-        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     entry_points=ENTRY_POINTS,
 )

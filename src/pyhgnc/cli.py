@@ -1,6 +1,16 @@
 """CLI for PyHGNC"""
-
 # -*- coding: utf-8 -*-
+import logging
+import os
+import sys
+import time
+
+import click
+
+from .constants import PYHGNC_DIR
+from .manager import database
+
+from sqlalchemy import create_engine
 
 """
 Module that contains the command line app
@@ -16,15 +26,6 @@ problems--the code will get executed twice:
 Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 
-import logging
-import os
-import sys
-import time
-
-import click
-
-from .constants import PYHGNC_DIR
-from . import manager
 
 log = logging.getLogger('pyhgnc')
 
@@ -37,6 +38,29 @@ fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 log.addHandler(fh)
 
+hint_connection_string = [
+    "MySQL/MariaDB (strongly recommended):\n\tmysql+pymysql://user:passwd@localhost/database?charset=utf8",
+    "PostgreSQL:\n\tpostgresql://user:passwd@localhost/database",
+    "MsSQL (pyodbc needed):\n\tmssql+pyodbc://user:passwd@database",
+    "SQLite (always works):",
+    "- Linux:\n\tsqlite:////absolute/path/to/database.db",
+    "- Windows:\n\tsqlite:///C:\\absolute\\path\\to\\database.db",
+    "Oracle:\n\toracle://user:passwd@localhost:1521/database\n"
+]
+
+
+def test_connection(conn_str):
+    try:
+        conn = create_engine(conn_str)
+        conn.connect()
+        del conn
+        click.secho('Connection was successful', fg='green')
+    except:
+        click.secho('Test was NOT successful', fg='black', bg='red')
+        click.echo("\n")
+        click.secho('Please use one of the following connection schemas', fg='black', bg='green')
+        click.secho('\n\n'.join(hint_connection_string))
+
 
 @click.group(help="PyHGNC Command Line Utilities on {}".format(sys.executable))
 @click.version_option()
@@ -46,10 +70,11 @@ def main():
 
 @main.command()
 @click.option('-c', '--connection', help='SQL Alchemy connection string')
-@click.option('-f', '--force_download', is_flag=True, help='forces download; overwrites last download')
-def update(connection, force_download):
+@click.option('-s', '--silent', help="True if want no output (e.g. cron job)", is_flag=True)
+@click.option('-p', '--from_path', help="Load data from path")
+def update(connection, silent, from_path):
     """Update the database"""
-    manager.database.update(connection, force_download)
+    database.update(connection=connection, silent=silent, from_path=from_path)
 
 
 @main.command(help="Set SQL Alchemy connection string, change default " +
@@ -57,24 +82,30 @@ def update(connection, force_download):
 @click.option('-c', '--connection')
 def setcon(connection):
     """Set the connection string"""
-    manager.database.set_connection(connection)
+    database.set_connection(connection)
 
 
 @main.command(help="Set SQL Alchemy connection string, change default " +
                    "configuration. Without any option, sqlite will be set as default.")
-@click.option('-h', '--host', default='localhost')
-@click.option('-u', '--user', default='pyctd_user')
-@click.option('-p', '--passwd', default='pyctd_passwd')
-@click.option('-d', '--db', default='pyctd')
-@click.option('-c', '--charset', default='utf8')
-def setmysql(host, user, passwd, db, charset):
-    manager.database.set_mysql_connection(host, user, passwd, db, charset)
+@click.option('-h', '--host', prompt="server name/ IP address database is hosted",
+              default='localhost', help="host / servername")
+@click.option('-u', '--user', prompt="MySQL/MariaDB user", default='pyhgnc_user', help="MySQL/MariaDB user")
+@click.option('-p', '--passwd', prompt="MySQL/MariaDB password", hide_input=True, default='pyhgnc_passwd',
+              help="MySQL/MariaDB password to access database")
+@click.option('-d', '--db', prompt="database name", default='pyhgnc', help="database name")
+@click.option('-c', '--charset', prompt="character set", default='utf8',
+              help="character set for mysql connection")
+def mysql(host, user, passwd, db, charset):
+    """Set MySQL/MariaDB connection"""
+    connection_string = database.set_mysql_connection(host=host, user=user, passwd=passwd, db=db, charset=charset)
+
+    test_connection(connection_string)
 
 
 @main.command()
 def getcon():
     """Get the connection string"""
-    click.echo(manager.database.BaseDbManager.get_connection_string())
+    click.echo(database.BaseDbManager.get_connection_string())
 
 
 @main.group(help="PyBEL Data Manager Utilities")

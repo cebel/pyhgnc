@@ -1,4 +1,6 @@
 sqlalchemy
-pybel
 configparser
 pymysql
+tqdm
+click
+pandas

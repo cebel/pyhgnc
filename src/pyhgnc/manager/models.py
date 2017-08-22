@@ -1,59 +1,104 @@
-"""This file contains the relational database models used by PyWikiPathways to store information from WikiPathways."""
+"""This file contains the relational database models used by HGNC."""
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Date
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
 
-HGNC_TABLE_NAME = 'pyhgnc_hgnc'
-ALIASSYMBOL_TABLE_NAME = 'pyhgnc_alassymbol'
-ALIASNAME_TABLE_NAME = 'pyhgnc_aliasname'
-GENEFAMILY_TABLE_NAME = 'pyhgnc_genefamily'
-REFSEQ_TABLE_NAME = 'pyhgnc_refseqaccession'
-RGD_TABLE_NAME = 'pyhgnc_rgd'
-OMIM_TABLE_NAME = 'pyhgnc_omim'
-MGD_TABLE_NAME = 'pyhgnc_mgd'
-UNIPROT_TABLE_NAME = 'pyhgnc_uniprot'
-CCDS_TABLE_NAME = 'pyhgnc_ccds'
-PUBMED_TABLE_NAME = 'pyhgnc_pubmed'
-ENA_TABLE_NAME = 'pyhgnc_ena'
-ENZYME_TABLE_NAME = 'pyhgnc_enzyme'
-LSDB_TABLE_NAME = 'pyhgnc_lsdb'
+from .defaults import TABLE_PREFIX
 
 Base = declarative_base()
 
 
-class HGNC(Base):
-    __tablename__ = HGNC_TABLE_NAME
+def foreign_key_to(table_name):
+    """Creates a standard foreign key to a table in the database
+
+    :param table_name: name of the table without TABLE_PREFIX
+    :type table_name: str
+    :return: foreign key column
+    :rtype: sqlalchemy.Column
+    """
+    foreign_column = TABLE_PREFIX + table_name + '.id'
+    return Column(Integer, ForeignKey(foreign_column))
+
+
+class MasterModel(object):
+
+    @declared_attr
+    def __tablename__(self):
+        return TABLE_PREFIX + self.__name__.lower()
+
+    __mapper_args__ = {'always_refresh': True}
 
     id = Column(Integer, primary_key=True)
 
+    def to_json(self):
+        data_dict = self.__dict__.copy()
+        del data_dict['_sa_instance_state']
+        return data_dict
+
+
+class HGNC(Base, MasterModel):
+    """
+    :cvar str name:
+    :cvar str symbol:
+    :cvar str identifier:
+    :cvar str status:
+    :cvar str uuid:
+
+    :cvar str locus_group:
+    :cvar str locus_type:
+
+    :cvar date date_name_changed:
+    :cvar date date_modified:
+    :cvar date date_symbol_changed:
+    :cvar date date_approved_reserved:
+
+    :cvar str ensembl_gene:
+    :cvar str horde:
+    :cvar str vega:
+    :cvar str lncrnadb:
+    :cvar str entrez:
+    :cvar str mirbase:
+    :cvar str iuphar:
+    :cvar str ucsc:
+    :cvar str snornabase:
+    :cvar str intermediatefilamentdb:
+
+    :cvar str pseudogeneorg:
+    :cvar str bioparadigmsslc:
+    :cvar str locationsortable:
+    :cvar str merop:
+
+    :cvar str location:
+    :cvar str cosmic:
+    """
     name = Column(String(255), nullable=True)
     symbol = Column(String(255), index=True)
-    hgncID = Column(String(255))
+    identifier = Column(Integer)
     status = Column(String(255))
     uuid = Column(String(255))
 
-    locusGroup = Column(String(255))
-    locusType = Column(String(255))
+    locus_group = Column(String(255))
+    locus_type = Column(String(255))
 
     # Date information
-    datenamechanged = Column(Date, nullable=True)
-    datemodified = Column(Date, nullable=True)
-    datesymbolchanged = Column(Date, nullable=True)
-    dateapprovedreserved = Column(Date, nullable=True)
+    date_name_changed = Column(Date, nullable=True)
+    date_modified = Column(Date, nullable=True)
+    date_symbol_changed = Column(Date, nullable=True)
+    date_approved_reserved = Column(Date, nullable=True)
 
     # Possible foreign keys ??
-    ensemblgene_id = Column(String(255), nullable=True)
+    ensembl_gene = Column(String(255), nullable=True)
     # ToDo: Must this be txt?
-    horde_id = Column(Text, nullable=True)
-    vega_id = Column(String(255), nullable=True)
-    lncrnadb_id = Column(String(255), nullable=True)
-    entrez_id = Column(String(255), nullable=True)
-    mirbase_id = Column(String(255), nullable=True)
-    iuphar_id = Column(String(255), nullable=True)
-    ucsc_id = Column(String(255), nullable=True)
-    snornabase_id = Column(String(255), nullable=True)
-    intermediatefilamentdb_id = Column(String(255), nullable=True)
+    horde = Column(Text, nullable=True)
+    vega = Column(String(255), nullable=True)
+    lncrnadb = Column(String(255), nullable=True)
+    entrez = Column(String(255), nullable=True)
+    mirbase = Column(String(255), nullable=True)
+    iuphar = Column(String(255), nullable=True)
+    ucsc = Column(String(255), nullable=True)
+    snornabase = Column(String(255), nullable=True)
+    intermediatefilamentdb = Column(String(255), nullable=True)
 
     pseudogeneorg = Column(String(255), nullable=True)
     bioparadigmsslc = Column(String(255), nullable=True)
@@ -66,12 +111,11 @@ class HGNC(Base):
     # ToDo: Must this be txt?
     imgt = Column(Text, nullable=True)
 
-
     # Boolean identifiers of several parameters (relationships)
     symbols = relationship('AliasSymbol')
     names = relationship('AliasName')
-    genefamilies = relationship('GeneFamily')
-    refseqaccessions = relationship('RefSeq')
+    gene_families = relationship('GeneFamily')
+    refseq_accessions = relationship('RefSeq')
     mgds = relationship('MGD')
     rgds = relationship('RGD')
     omims = relationship('OMIM')
@@ -85,139 +129,165 @@ class HGNC(Base):
     # cd = models.TextField(null=True)
 
 
-class AliasSymbol(Base):
-    """Contains all alias symbols and/or previous symbols of an hgnc entry."""
-    __tablename__ = ALIASSYMBOL_TABLE_NAME
+class AliasSymbol(Base, MasterModel):
+    """Contains all alias symbols and/or previous symbols of an hgnc entry.
 
-    id = Column(Integer, primary_key=True)
+    :cvar str symbol:
+    :cvar bool isprev:
+    """
 
     symbol = Column(String(255))
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='symbols')
 
     isprev = Column(Boolean, default=False)
 
 
-class AliasName(Base):
-    """Contains all alias names and/or previous names of an hgnc entry."""
-    __tablename__ = ALIASNAME_TABLE_NAME
+class AliasName(Base, MasterModel):
+    """Contains all alias names and/or previous names of an hgnc entry.
 
-    id = Column(Integer, primary_key=True)
-
+    :cvar str name:
+    :cvar bool isprev:
+    """
     name = Column(String(255))
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='names')
 
     isprev = Column(Boolean, default=False)
 
 
-class GeneFamily(Base):
-    """Contains all gene family identifiers and names of an hgnc entry."""
-    __tablename__ = GENEFAMILY_TABLE_NAME
+class GeneFamily(Base, MasterModel):
+    """Contains all gene family identifiers and names of an hgnc entry.
 
-    id = Column(Integer, primary_key=True)
+    :cvar int familyid:
+    :cvar str familyname:
+    """
 
     familyid = Column(Integer, nullable=True)
     familyname = Column(String(255), nullable=True)
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
-    hgnc = relationship('HGNC', back_populates='genefamilies')
+
+    hgnc_id = foreign_key_to('hgnc')
+    hgnc = relationship('HGNC', back_populates='gene_families')
 
 
-class RefSeq(Base):
-    __tablename__ = REFSEQ_TABLE_NAME
+class RefSeq(Base, MasterModel):
+    """RefSeq accession number
 
-    id = Column(Integer, primary_key=True)
+    See also `RefSeq database <https://www.ncbi.nlm.nih.gov/refseq/>`_ for more information
+
+    :cvar str accession:
+    """
     accession = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
-    hgnc = relationship('HGNC', back_populates='refseqaccessions')
+    hgnc_id = foreign_key_to('hgnc')
+    hgnc = relationship('HGNC', back_populates='refseq_accessions')
 
 
-class RGD(Base):
-    __tablename__ = RGD_TABLE_NAME
+class RGD(Base, MasterModel):
+    """Rat Genome Database identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str rgdid:
+    """
     rgdid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='rgds')
 
 
-class OMIM(Base):
-    __tablename__ = OMIM_TABLE_NAME
+class OMIM(Base, MasterModel):
+    """Online Mendelian Inheritance in Man identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str omimid:
+    """
     omimid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='omims')
 
 
-class MGD(Base):
-    __tablename__ = MGD_TABLE_NAME
+class MGD(Base, MasterModel):
+    """Mouse Genome Database identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str mgdid:
+    """
     mgdid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='mgds')
 
 
-class Uniprot(Base):
-    __tablename__ = UNIPROT_TABLE_NAME
+class Uniprot(Base, MasterModel):
+    """Universal Protein Resource (UniProt) identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str uniprotid:
+
+    see also `UniProt webpage <http://www.uniprot.org>`_ for more information
+    """
+
     uniprotid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='uniprots')
 
 
-class CCDS(Base):
-    __tablename__ = CCDS_TABLE_NAME
+class CCDS(Base, MasterModel):
+    """Consensus CDS (CCDS) project identifier
 
-    id = Column(Integer, primary_key=True)
+    see also `CCDS <https://www.ncbi.nlm.nih.gov/projects/CCDS>`_ for more information
+
+    """
     ccdsid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='ccds')
 
 
-class PubMed(Base):
-    __tablename__ = PUBMED_TABLE_NAME
+class PubMed(Base, MasterModel):
+    """PubMed identifier
 
-    id = Column(Integer, primary_key=True)
+    TODO: pubmedid should be an integer
+
+    :cvar str pubmedid:
+    """
     pubmedid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='pubmeds')
 
 
-class ENA(Base):
-    __tablename__ = ENA_TABLE_NAME
+class ENA(Base, MasterModel):
+    """European Nucleotide Archive (ENA) identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str enaid:
+    """
+
     enaid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='enas')
 
 
-class Enzyme(Base):
-    __tablename__ = ENZYME_TABLE_NAME
+class Enzyme(Base, MasterModel):
+    """Enzyme identifier
 
-    id = Column(Integer, primary_key=True)
+    :cvar str enzymeid:
+    """
+
     enzymeid = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='enzymes')
 
 
-class LSDB(Base):
-    __tablename__ = LSDB_TABLE_NAME
+class LSDB(Base, MasterModel):
+    """Locus Specific Mutation Database
 
-    id = Column(Integer, primary_key=True)
+    :cvar str lsdb:
+    """
+
     lsdb = Column(String(255))
 
-    hgnc_id = Column(Integer, ForeignKey('{}.id'.format(HGNC_TABLE_NAME)))
+    hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='lsdbs')

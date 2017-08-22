@@ -15,10 +15,12 @@ Installation
 """
 
 # ToDo: Make all the imports!
-
+from .manager.query import QueryManager
 from .manager.database import update
 
-__all__ = ['update']
+query = QueryManager
+
+__all__ = ['update', 'query']
 
 __version__ = '0.0.1'
 

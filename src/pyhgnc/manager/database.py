@@ -4,19 +4,20 @@
 import os
 import time
 import logging
-import zipfile
 import json
 
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
+from tqdm import tqdm
 from urllib import request
+from datetime import datetime
 
 from configparser import RawConfigParser, ConfigParser
 
 from . import models
 from . import defaults
-from ..constants import PYHGNC_DATA_DIR, PYHGNC_DIR, PYHGNC_LOG_DIR, HGNC_JSON, bcolors
+from ..constants import PYHGNC_LOG_DIR, HGNC_JSON
 
 
 log = logging.getLogger('pyhgnc')
@@ -41,40 +42,7 @@ class BaseDbManager(object):
             self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
             self.session = scoped_session(self.sessionmaker)
         except:
-            self.set_connection_string_by_user_input()
-            self.__init__()
-
-    def set_connection_string_by_user_input(self):
-        """Asks the user to setup a valid SQLAlchemy connection string if the first connection
-        attempt did not work."""
-        # ToDo: Should this maybe happen in cli?
-
-        user_connection = input(
-            bcolors.WARNING + "\nFor any reason connection to " + bcolors.ENDC +
-            bcolors.FAIL + "{}".format(self.connection) + bcolors.ENDC +
-            bcolors.WARNING + " is not possible.\n\n" + bcolors.ENDC +
-            "For more information about SQLAlchemy connection strings go to:\n" +
-            "http://docs.sqlalchemy.org/en/latest/core/engines.html\n\n"
-            "Please insert a valid connection string:\n" +
-            bcolors.UNDERLINE + "Examples:\n\n" + bcolors.ENDC +
-            "MySQL (recommended):\n" +
-            bcolors.OKGREEN + "\tmysql+pymysql://user:passwd@localhost/database?charset=utf8\n" + bcolors.ENDC +
-            "PostgreSQL:\n" +
-            bcolors.OKGREEN + "\tpostgresql://scott:tiger@localhost/mydatabase\n" + bcolors.ENDC +
-            "MsSQL (pyodbc have to be installed):\n" +
-            bcolors.OKGREEN + "\tmssql+pyodbc://user:passwd@database\n" + bcolors.ENDC +
-            "SQLite (always works):\n" +
-            " - Linux:\n" +
-            bcolors.OKGREEN + "\tsqlite:////absolute/path/to/database.db\n" + bcolors.ENDC +
-            " - Windows:\n" +
-            bcolors.OKGREEN + "\tsqlite:///C:\\path\\to\\database.db\n" + bcolors.ENDC +
-            "Oracle:\n" +
-            bcolors.OKGREEN + "\toracle://user:passwd@127.0.0.1:1521/database\n\n" + bcolors.ENDC +
-            "[RETURN] for standard connection {}:\n".format(defaults.sqlalchemy_connection_string_default)
-        )
-        if not (user_connection or user_connection.strip()):
-            user_connection = defaults.sqlalchemy_connection_string_default
-        set_connection(user_connection.strip())
+            log.warning('No valid database connection. Execute `pyuniprot connection` on command line')
 
     def _create_tables(self, checkfirst=True):
         """creates all tables from models in your database
@@ -130,44 +98,51 @@ class DbManager(BaseDbManager):
 
         super(DbManager, self).__init__(connection=connection)
 
-    def db_import(self):
+    def db_import(self, silent=False, from_path=None):
+        self._drop_tables()
         self._create_tables()
-        self.insert_data(hgnc_dict=DbManager.download_hgnc_json())
+        json_data = DbManager.load_hgnc_json(from_path)
+        self.insert_data(hgnc_dict=json_data, silent=silent)
 
-    def insert_data(self, hgnc_dict):
+    @classmethod
+    def get_date(cls, hgnc, key):
+        date_value = hgnc.get(key)
+        if date_value:
+            return datetime.strptime(date_value, "%Y-%m-%d",).date()
 
-        for hgnc_data in hgnc_dict['docs']:
+    def insert_data(self, hgnc_dict, silent=False):
+
+        for hgnc_data in tqdm(hgnc_dict['docs'], disable=silent):
             hgnc_table = {
                 'symbol': hgnc_data['symbol'],
-                'hgncID': hgnc_data['hgnc_id'],
+                'identifier': int(hgnc_data['hgnc_id'].split(':')[-1]),
+                'name': hgnc_data['name'],
                 'status': hgnc_data['status'],
                 'uuid': hgnc_data['uuid'],
-                'locusGroup': hgnc_data['locus_group'],
-                'locusType': hgnc_data['locus_type'],
-                'ensemblgene_id': hgnc_data['ensembl_gene_id'] if 'ensembl_gene_id' in hgnc_data else None,
-                'horde_id': hgnc_data['horde_id'] if 'horde_id' in hgnc_data else None,
-                'vega_id': hgnc_data['vega_id'] if 'vega_id' in hgnc_data else None,
-                'lncrnadb_id': hgnc_data['lncrnadb'] if 'lncrnadb' in hgnc_data else None,
-                'entrez_id': hgnc_data['entrez_id'] if 'entrez_id' in hgnc_data else None,
-                'mirbase_id': hgnc_data['mirbase'] if 'mirbare' in hgnc_data else None,
-                'iuphar_id': hgnc_data['iuphar'] if 'uiphar' in hgnc_data else None,
-                'ucsc_id': hgnc_data['ucsc_id'] if 'ucsc_id' in hgnc_data else None,
-                'snornabase_id': hgnc_data['snornabase'] if 'snornabase' in hgnc_data else None,
-                'intermediatefilamentdb_id': hgnc_data['intermediate_filament_db'] if 'intermediate_filament_db' in hgnc_data else None,
-                'pseudogeneorg': hgnc_data['pseudogene.org'] if 'pseudogene.org' in hgnc_data else None,
-                'bioparadigmsslc': hgnc_data['bioparadigms_slc'] if 'bioparadigms_slc' in hgnc_data else None,
-                'locationsortable': hgnc_data['location_sortable'] if 'location_sortable' in hgnc_data else None,
-                'merop': hgnc_data['merops'] if 'merops' in hgnc_data else None,
-                'location': hgnc_data['location'] if 'location' in hgnc_data else None,
-                'cosmic': hgnc_data['cosmic'] if 'cosmic' in hgnc_data else None,
-                'imgt': hgnc_data['imgt'] if 'imgt' in hgnc_data else None
+                'locus_group': hgnc_data['locus_group'],
+                'locus_type': hgnc_data['locus_type'],
+                'ensembl_gene': hgnc_data.get('ensembl_gene_id'),
+                'horde': hgnc_data.get('horde_id'),
+                'vega': hgnc_data.get('vega_id'),
+                'lncrnadb': hgnc_data.get('lncrnadb'),
+                'entrez': hgnc_data.get('entrez_id'),
+                'mirbase': hgnc_data.get('mirbase'),
+                'iuphar': hgnc_data.get('iuphar'),
+                'ucsc': hgnc_data.get('ucsc_id'),
+                'snornabase': hgnc_data.get('snornabase'),
+                'intermediatefilamentdb': hgnc_data.get('intermediate_filament_db'),
+                'pseudogeneorg': hgnc_data.get('pseudogene.org'),
+                'bioparadigmsslc': hgnc_data.get('bioparadigms_slc'),
+                'locationsortable': hgnc_data.get('location_sortable'),
+                'merop': hgnc_data.get('merops'),
+                'location': hgnc_data.get('location'),
+                'cosmic': hgnc_data.get('cosmic'),
+                'imgt': hgnc_data.get('imgt'),
+                'date_name_changed': self.get_date(hgnc_data, 'date_name_changed'),
+                'date_modified': self.get_date(hgnc_data, 'date_modified'),
+                'date_symbol_changed': self.get_date(hgnc_data, 'date_symbol_changed'),
+                'date_approved_reserved': self.get_date(hgnc_data, 'date_approved_reserved')
             }
-
-            # 'datenamechanged': hgnc_data['date_name_changed'] if 'date_name_changed' in hgnc_data else None,
-            # 'datemodified': hgnc_data['date_modified'] if 'date_modified' in hgnc_data else None,
-            # 'datesymbolchanged': hgnc_data['date_symbol_changed'] if 'date_symbol_changed' in hgnc_data else None,
-            # 'dateapprovedreserved': hgnc_data[
-            # 'date_approved_reserved'] if 'date_approved_reserved' in hgnc_data else None,
 
             hgnc = models.HGNC(**hgnc_table)
             self.session.add(hgnc)
@@ -249,21 +224,28 @@ class DbManager(BaseDbManager):
                 for lsdb in hgnc_data['lsdb']:
                     self.session.add(models.LSDB(lsdb=lsdb,
                                                  hgnc=hgnc))
+        if not silent:
+            print('load data into database')
 
         self.session.commit()
 
     @staticmethod
-    def download_hgnc_json():
+    def load_hgnc_json(from_path=None):
 
-        response = request.urlopen(HGNC_JSON)
-        hgnc_dict = json.loads(response.read().decode())
+        if from_path:
+            with open(from_path) as response:
+                log.info('loading json data from {}'.format(from_path))
+                hgnc_dict = json.loads(response.read())
+        else:
+            response = request.urlopen(HGNC_JSON)
+            hgnc_dict = json.loads(response.read().decode())
 
         return hgnc_dict['response']
 
 
-def update(connection=None, urls=None, force_download=None):
+def update(connection=None, silent=False, from_path=None):
     database = DbManager(connection)
-    database.db_import()
+    database.db_import(silent=silent, from_path=from_path)
     database.session.close()
 
 
@@ -285,3 +267,26 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
         config.set('database', 'sqlalchemy_connection_string', connection)
         with open(config_path, 'w') as configfile:
             config.write(configfile)
+
+
+def set_mysql_connection(host='localhost', user='pyuniprot_user', passwd='pyuniprot_passwd', db='pyuniprot',
+                         charset='utf8'):
+    """Method to set a MySQL connection
+
+    :param host: MySQL database host
+    :param user: MySQL database user
+    :param passwd: MySQL database password
+    :param db: MySQL database name
+    :param charset: MySQL database charater set
+    :return: None
+    """
+    connection_string = 'mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'.format(
+        host=host,
+        user=user,
+        passwd=passwd,
+        db=db,
+        charset=charset
+    )
+    set_connection(connection_string)
+
+    return connection_string
