@@ -87,6 +87,13 @@ class BaseDbManager(object):
 
 
 class DbManager(BaseDbManager):
+    enzymes = {}
+    gene_families = {}
+    refseq_accessions = {}
+    mgds = {}
+    uniprots = {}
+    pubmeds = {}
+    enas = {}
 
     def __init__(self, connection=None):
         """The DbManager implements all function to upload HGNC data into the database. Prefered SQL Alchemy
@@ -109,6 +116,170 @@ class DbManager(BaseDbManager):
         date_value = hgnc.get(key)
         if date_value:
             return datetime.strptime(date_value, "%Y-%m-%d",).date()
+
+    @classmethod
+    def get_alias_symbols(cls, hgnc):
+        alias_symbols = []
+
+        if 'alias_symbol' in hgnc:
+            for alias in hgnc['alias_symbol']:
+                alias_symbols.append(models.AliasSymbol(alias_symbol=alias))
+        if 'prev_symbol' in hgnc:
+            for prev in hgnc['prev_symbol']:
+                alias_symbols.append(models.AliasSymbol(alias_symbol=prev, isprev=True))
+        return alias_symbols
+
+    @classmethod
+    def get_alias_names(cls, hgnc):
+        alias_names = []
+
+        if 'alias_name' in hgnc:
+            for alias in hgnc['alias_name']:
+                alias_names.append(models.AliasName(alias_name=alias))
+
+        if 'prev_name' in hgnc:
+            for prev in hgnc['prev_name']:
+                alias_names.append(models.AliasName(alias_name=prev, isprev=True))
+
+        return alias_names
+
+    def get_gene_families(self, hgnc):
+        gene_families = []
+
+        if 'gene_family' in hgnc:
+
+            for i, family in enumerate(hgnc['gene_family']):
+
+                family_identifier = hgnc['gene_family_id'][i]
+
+                if family_identifier not in self.gene_families:
+
+                    gene_family = models.GeneFamily(family_identifier=family_identifier, family_name=family)
+                    self.gene_families[family_identifier] = gene_family
+
+                gene_families.append(self.gene_families[family_identifier])
+
+        return gene_families
+
+    def get_refseq_accessions(self, hgnc):
+        refseq_accessions = []
+
+        if 'refseq_accession' in hgnc:
+            for accession in hgnc['refseq_accession']:
+
+                if accession not in self.refseq_accessions:
+                    self.refseq_accessions[accession] = models.RefSeq(accession=accession)
+
+                refseq_accessions.append(self.refseq_accessions[accession])
+
+        return refseq_accessions
+
+    def get_mgds(self, hgnc):
+        mgds = []
+
+        if 'mgd_id' in hgnc:
+
+            for mgd in hgnc['mgd_id']:
+
+                if mgd not in self.mgds:
+                    mgdid = int(mgd.split(':')[-1])
+                    self.mgds[mgd] = models.MGD(mgdid=mgdid)
+
+                mgds.append(self.mgds[mgd])
+
+        return mgds
+
+    def get_rgds(self, hgnc):
+        rgds = []
+
+        if 'rgd_id' in hgnc:
+
+            for rgd in hgnc['rgd_id']:
+                rgdid = int(rgd.split(':')[-1])
+                rgds.append(models.RGD(rgdid=rgdid))
+
+        return rgds
+
+    def get_omims(self, hgnc):
+        omims = []
+
+        if 'omim_id' in hgnc:
+
+            for omim in hgnc['omim_id']:
+                omims.append(models.OMIM(omimid=omim))
+
+        return omims
+
+    def get_uniprots(self, hgnc):
+        uniprots = []
+
+        if 'uniprot_ids' in hgnc:
+            for uniprot in hgnc['uniprot_ids']:
+
+                if uniprot not in self.uniprots:
+                    self.uniprots[uniprot] = models.Uniprot(uniprotid=uniprot)
+
+            uniprots.append(self.uniprots[uniprot])
+
+        return uniprots
+
+    def get_ccds(self, hgnc):
+        ccds = []
+
+        if 'ccds_id' in hgnc:
+            for ccdsid in hgnc['ccds_id']:
+                ccds.append(models.CCDS(ccdsid=ccdsid))
+
+        return ccds
+
+    def get_pubmeds(self, hgnc):
+        pubmeds = []
+
+        if 'pubmed_id' in hgnc:
+            for pubmed in hgnc['pubmed_id']:
+
+                if pubmed not in self.pubmeds:
+                    self.pubmeds[pubmed] = models.PubMed(pubmedid=int(pubmed))
+
+                pubmeds.append(self.pubmeds[pubmed])
+
+        return pubmeds
+
+    def get_enas(self, hgnc):
+        enas = []
+
+        if 'ena' in hgnc:
+            for ena in hgnc['ena']:
+                if ena not in self.enas:
+                    self.enas[ena] = models.ENA(enaid=ena)
+
+                enas.append(self.enas[ena])
+
+        return enas
+
+    def get_lsdbs(self, hgnc):
+        lsdbs = []
+
+        if 'lsdb' in hgnc:
+
+            for lsdb in hgnc['lsdb']:
+                lsdbs.append(models.LSDB(lsdb=lsdb))
+
+        return lsdbs
+
+    def get_enzymes(self, hgnc):
+        enzymes = []
+
+        if 'enzyme_id' in hgnc:
+
+            for ec_number in hgnc['enzyme_id']:
+
+                if ec_number not in self.enzymes:
+                    self.enzymes[ec_number] = models.Enzyme(ec_number=ec_number)
+
+                enzymes.append(self.enzymes[ec_number])
+
+        return enzymes
 
     def insert_data(self, hgnc_dict, silent=False):
 
@@ -141,89 +312,24 @@ class DbManager(BaseDbManager):
                 'date_name_changed': self.get_date(hgnc_data, 'date_name_changed'),
                 'date_modified': self.get_date(hgnc_data, 'date_modified'),
                 'date_symbol_changed': self.get_date(hgnc_data, 'date_symbol_changed'),
-                'date_approved_reserved': self.get_date(hgnc_data, 'date_approved_reserved')
+                'date_approved_reserved': self.get_date(hgnc_data, 'date_approved_reserved'),
+                'alias_symbols': self.get_alias_symbols(hgnc_data),
+                'alias_names': self.get_alias_names(hgnc_data),
+                'gene_families': self.get_gene_families(hgnc_data),
+                'refseq_accessions': self.get_refseq_accessions(hgnc_data),
+                'mgds': self.get_mgds(hgnc_data),
+                'rgds': self.get_rgds(hgnc_data),
+                'omims': self.get_omims(hgnc_data),
+                'uniprots': self.get_uniprots(hgnc_data),
+                'ccds': self.get_ccds(hgnc_data),
+                'pubmeds': self.get_pubmeds(hgnc_data),
+                'enas': self.get_enas(hgnc_data),
+                'lsdbs': self.get_lsdbs(hgnc_data),
+                'enzymes': self.get_enzymes(hgnc_data)
             }
 
-            hgnc = models.HGNC(**hgnc_table)
-            self.session.add(hgnc)
+            self.session.add(models.HGNC(**hgnc_table))
 
-            if 'alias_symbol' in hgnc_data or 'prev_symbol' in hgnc_data:
-                if 'alias_symbol' in hgnc_data:
-                    for alias in hgnc_data['alias_symbol']:
-                        self.session.add(models.AliasSymbol(symbol=alias,
-                                                            hgnc=hgnc))
-                else:
-                    for prev in hgnc_data['prev_symbol']:
-                        self.session.add(models.AliasSymbol(symbol=prev,
-                                                            hgnc=hgnc,
-                                                            isprev=True))
-
-            if 'alias_name' in hgnc_data or 'prev_name' in hgnc_data:
-                if 'alias_name' in hgnc_data:
-                    for alias in hgnc_data['alias_name']:
-                        self.session.add(models.AliasName(name=alias,
-                                                          hgnc=hgnc))
-                else:
-                    for prev in hgnc_data['prev_name']:
-                        self.session.add(models.AliasName(name=prev,
-                                                          hgnc=hgnc,
-                                                          isprev=True))
-
-            if 'gene_family' in hgnc_data:
-                for i, family in enumerate(hgnc_data['gene_family']):
-                    self.session.add(models.GeneFamily(familyid=hgnc_data['gene_family_id'][i],
-                                                       familyname=family,
-                                                       hgnc=hgnc))
-
-            if 'refseq_accession' in hgnc_data:
-                for accession in hgnc_data['refseq_accession']:
-                    self.session.add(models.RefSeq(accession=accession,
-                                                       hgnc=hgnc))
-
-            if 'rgd_id' in hgnc_data:
-                for rgd in hgnc_data['rgd_id']:
-                    self.session.add(models.RGD(rgdid=rgd,
-                                                hgnc=hgnc))
-
-            if 'mgd_id' in hgnc_data:
-                for mgd in hgnc_data['mgd_id']:
-                    self.session.add(models.MGD(mgdid=mgd,
-                                                hgnc=hgnc))
-
-            if 'omim_id' in hgnc_data:
-                for omim in hgnc_data['omim_id']:
-                    self.session.add(models.OMIM(omimid=omim,
-                                                 hgnc=hgnc))
-
-            if 'uniprot_ids' in hgnc_data:
-                for uniprot in hgnc_data['uniprot_ids']:
-                    self.session.add(models.Uniprot(uniprotid=uniprot,
-                                                    hgnc=hgnc))
-
-            if 'ccds_id' in hgnc_data:
-                for ccds in hgnc_data['ccds_id']:
-                    self.session.add(models.CCDS(ccdsid=ccds,
-                                                 hgnc=hgnc))
-
-            if 'pubmed_id' in hgnc_data:
-                for pubmed in hgnc_data['pubmed_id']:
-                    self.session.add(models.PubMed(pubmedid=pubmed,
-                                                   hgnc=hgnc))
-
-            if 'enzyme_id' in hgnc_data:
-                for enzyme in hgnc_data['enzyme_id']:
-                    self.session.add(models.Enzyme(enzymeid=enzyme,
-                                                   hgnc=hgnc))
-
-            if 'ena' in hgnc_data:
-                for ena in hgnc_data['ena']:
-                    self.session.add(models.ENA(enaid=ena,
-                                                hgnc=hgnc))
-
-            if 'lsdb' in hgnc_data:
-                for lsdb in hgnc_data['lsdb']:
-                    self.session.add(models.LSDB(lsdb=lsdb,
-                                                 hgnc=hgnc))
         if not silent:
             print('load data into database')
 

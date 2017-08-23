@@ -44,6 +44,33 @@ class QueryManager(BaseDbManager):
                 query_obj = self._model_query(query_obj, search4, model_attrib)
         return query_obj
 
+    def get_one_to_many_queries(self, query_obj, one_to_many_queries):
+        for search4, model_attrib in one_to_many_queries:
+            if search4 is not None:
+                query_obj = self._one_to_many_query(query_obj, search4, model_attrib)
+        return query_obj
+
+    @classmethod
+    def _one_to_many_query(cls, query_obj, search4, model_attrib):
+        """extends and returns a SQLAlchemy query object to allow one-to-many queries
+
+        :param query_obj: SQL Alchemy query object
+        :param str search4: search string
+        :param model_attrib: attribute in model
+        """
+        model = model_attrib.parent.class_
+
+        if isinstance(search4, str):
+            query_obj = query_obj.join(model).filter(model_attrib.like(search4))
+
+        elif isinstance(search4, int):
+            query_obj = query_obj.join(model).filter(model_attrib == search4)
+
+        elif isinstance(search4, Iterable):
+            query_obj = query_obj.join(model).filter(model_attrib.in_(search4))
+
+        return query_obj
+
     @classmethod
     def _model_query(cls, query_obj, search4, model_attrib):
 
@@ -130,7 +157,13 @@ class QueryManager(BaseDbManager):
         )
         q = self.get_model_queries(q, model_queries_config)
 
-        # q = self.get_many_to_many_queries(q, ((entry_name, models.Keyword.entries, models.Entry.name),))
+        many_to_many_queries_config = (
+            (pmid, models.Entry.pmids, models.Pmid.pmid),
+            (keyword, models.Entry.keywords, models.Keyword.name),
+            (subcellular_location, models.Entry.subcellular_locations, models.SubcellularLocation.location),
+            (tissue_in_reference, models.Entry.tissue_in_references, models.TissueInReference.tissue)
+        )
+        q = self.get_many_to_many_queries(q, many_to_many_queries_config)
 
         return self._limit_and_df(q, limit, as_df)
 

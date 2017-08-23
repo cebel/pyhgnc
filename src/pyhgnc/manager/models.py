@@ -1,6 +1,6 @@
 """This file contains the relational database models used by HGNC."""
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Date
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Date, Table
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
 
@@ -21,6 +21,14 @@ def foreign_key_to(table_name):
     return Column(Integer, ForeignKey(foreign_column))
 
 
+def get_many2many_table(table1, table2):
+    table_name = ('{}{}__{}'.format(TABLE_PREFIX, table1, table2))
+    return Table(table_name, Base.metadata,
+                 Column('{}_id'.format(table1), Integer, ForeignKey('{}{}.id'.format(TABLE_PREFIX, table1))),
+                 Column('{}_id'.format(table2), Integer, ForeignKey('{}{}.id'.format(TABLE_PREFIX, table2)))
+                 )
+
+
 class MasterModel(object):
 
     @declared_attr
@@ -35,6 +43,20 @@ class MasterModel(object):
         data_dict = self.__dict__.copy()
         del data_dict['_sa_instance_state']
         return data_dict
+
+hgnc_enzyme = get_many2many_table('hgnc', 'enzyme')
+
+hgnc_gene_family = get_many2many_table('hgnc', 'genefamily')
+
+hgnc_refseq = get_many2many_table('hgnc', 'refseq')
+
+hgnc_mgd = get_many2many_table('hgnc', 'mgd')
+
+hgnc_uniprot = get_many2many_table('hgnc', 'uniprot')
+
+hgnc_pubmed = get_many2many_table('hgnc', 'pubmed')
+
+hgnc_ena =  get_many2many_table('hgnc', 'ena')
 
 
 class HGNC(Base, MasterModel):
@@ -112,19 +134,58 @@ class HGNC(Base, MasterModel):
     imgt = Column(Text, nullable=True)
 
     # Boolean identifiers of several parameters (relationships)
-    symbols = relationship('AliasSymbol')
-    names = relationship('AliasName')
-    gene_families = relationship('GeneFamily')
-    refseq_accessions = relationship('RefSeq')
-    mgds = relationship('MGD')
+    alias_symbols = relationship('AliasSymbol')
+    alias_names = relationship('AliasName')
+
+
     rgds = relationship('RGD')
     omims = relationship('OMIM')
-    uniprots = relationship('Uniprot')
+
     ccds = relationship('CCDS')
-    pubmeds = relationship('PubMed')
-    enas = relationship('ENA')
-    enzymes = relationship('Enzyme')
+
     lsdbs = relationship('LSDB')
+
+    enzymes = relationship(
+        "Enzyme",
+        secondary=hgnc_enzyme,
+        back_populates="hgncs"
+    )
+
+    gene_families = relationship(
+        'GeneFamily',
+        secondary=hgnc_gene_family,
+        back_populates="hgncs"
+    )
+
+    refseq_accessions = relationship(
+        'RefSeq',
+        secondary=hgnc_refseq,
+        back_populates="hgncs"
+    )
+
+    mgds = relationship(
+        'MGD',
+        secondary=hgnc_mgd,
+        back_populates="hgncs"
+    )
+
+    uniprots = relationship(
+        'Uniprot',
+        secondary=hgnc_uniprot,
+        back_populates="hgncs"
+    )
+
+    pubmeds = relationship(
+        'PubMed',
+        secondary=hgnc_pubmed,
+        back_populates="hgncs"
+    )
+
+    enas = relationship(
+        'ENA',
+        secondary=hgnc_ena,
+        back_populates="hgncs"
+    )
 
     # cd = models.TextField(null=True)
 
@@ -136,10 +197,10 @@ class AliasSymbol(Base, MasterModel):
     :cvar bool isprev:
     """
 
-    symbol = Column(String(255))
+    alias_symbol = Column(String(255))
 
     hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='symbols')
+    hgnc = relationship('HGNC', back_populates='alias_symbols')
 
     isprev = Column(Boolean, default=False)
 
@@ -150,10 +211,10 @@ class AliasName(Base, MasterModel):
     :cvar str name:
     :cvar bool isprev:
     """
-    name = Column(String(255))
+    alias_name = Column(String(255))
 
     hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='names')
+    hgnc = relationship('HGNC', back_populates='alias_names')
 
     isprev = Column(Boolean, default=False)
 
@@ -165,11 +226,13 @@ class GeneFamily(Base, MasterModel):
     :cvar str familyname:
     """
 
-    familyid = Column(Integer, nullable=True)
-    familyname = Column(String(255), nullable=True)
+    family_identifier = Column(Integer, unique=True)
+    family_name = Column(String(255))
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='gene_families')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_gene_family,
+        back_populates="gene_families")
 
 
 class RefSeq(Base, MasterModel):
@@ -181,8 +244,10 @@ class RefSeq(Base, MasterModel):
     """
     accession = Column(String(255))
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='refseq_accessions')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_refseq,
+        back_populates="refseq_accessions")
 
 
 class RGD(Base, MasterModel):
@@ -190,7 +255,7 @@ class RGD(Base, MasterModel):
 
     :cvar str rgdid:
     """
-    rgdid = Column(String(255))
+    rgdid = Column(Integer)
 
     hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='rgds')
@@ -201,7 +266,7 @@ class OMIM(Base, MasterModel):
 
     :cvar str omimid:
     """
-    omimid = Column(String(255))
+    omimid = Column(Integer)
 
     hgnc_id = foreign_key_to('hgnc')
     hgnc = relationship('HGNC', back_populates='omims')
@@ -212,10 +277,12 @@ class MGD(Base, MasterModel):
 
     :cvar str mgdid:
     """
-    mgdid = Column(String(255))
+    mgdid = Column(Integer)
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='mgds')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_mgd,
+        back_populates="mgds")
 
 
 class Uniprot(Base, MasterModel):
@@ -228,8 +295,10 @@ class Uniprot(Base, MasterModel):
 
     uniprotid = Column(String(255))
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='uniprots')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_uniprot,
+        back_populates="uniprots")
 
 
 class CCDS(Base, MasterModel):
@@ -251,10 +320,12 @@ class PubMed(Base, MasterModel):
 
     :cvar str pubmedid:
     """
-    pubmedid = Column(String(255))
+    pubmedid = Column(Integer)
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='pubmeds')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_pubmed,
+        back_populates="pubmeds")
 
 
 class ENA(Base, MasterModel):
@@ -265,8 +336,10 @@ class ENA(Base, MasterModel):
 
     enaid = Column(String(255))
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='enas')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_ena,
+        back_populates="enas")
 
 
 class Enzyme(Base, MasterModel):
@@ -275,10 +348,12 @@ class Enzyme(Base, MasterModel):
     :cvar str enzymeid:
     """
 
-    enzymeid = Column(String(255))
+    ec_number = Column(String(255))
 
-    hgnc_id = foreign_key_to('hgnc')
-    hgnc = relationship('HGNC', back_populates='enzymes')
+    hgncs = relationship(
+        "HGNC",
+        secondary=hgnc_enzyme,
+        back_populates="enzymes")
 
 
 class LSDB(Base, MasterModel):
