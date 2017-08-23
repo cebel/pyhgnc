@@ -278,7 +278,7 @@ PyHGNC
 - Distributed by `PyPI <https://pypi.python.org/pypi/pyhgnc>`_
 - Chat on `Gitter <https://gitter.im/pyhgnc/Lobby>`_
 
-.. |stable_build| image:: https://travis-ci.org/cebel/pyUniProt.png?branch=master
+.. |stable_build| image:: https://travis-ci.org/cebel/pyUniProt.svg?branch=master
     :target: https://travis-ci.org/cebel/pyhgnc
     :alt: Stable Build Status
 
@@ -286,13 +286,13 @@ PyHGNC
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Development Documentation Status
 
-.. |pypi_license| image:: https://img.shields.io/pypi/l/PyHGNC.png
+.. |pypi_license| image:: https://img.shields.io/pypi/l/PyHGNC.svg
     :alt: Apache 2.0 License
 
-.. |python_versions| image:: https://img.shields.io/pypi/pyversions/PyHGNC.png
+.. |python_versions| image:: https://img.shields.io/pypi/pyversions/PyHGNC.svg
     :alt: Stable Supported Python Versions
 
-.. |pypi_version| image:: https://img.shields.io/pypi/v/PyHGNC.png
+.. |pypi_version| image:: https://img.shields.io/pypi/v/PyHGNC.svg
     :alt: Current version on PyPI
 
 .. |phago_logo| image:: https://raw.githubusercontent.com/cebel/pyhgnc/master/docs/source/_static/logos/phago_logo.jpeg
