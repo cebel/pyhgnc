@@ -4,3 +4,7 @@ pymysql
 tqdm
 click
 pandas
+flasgger
+flask
+passlib
+wtforms

@@ -5,9 +5,11 @@ import os
 import time
 import logging
 import json
+import pandas
+import numpy
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, load_only
 
 from tqdm import tqdm
 from urllib import request
@@ -15,6 +17,7 @@ from datetime import datetime
 
 from configparser import RawConfigParser, ConfigParser
 
+from pyhgnc import constants
 from . import models
 from . import defaults
 from ..constants import PYHGNC_LOG_DIR, HGNC_JSON
@@ -42,7 +45,7 @@ class BaseDbManager(object):
             self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
             self.session = scoped_session(self.sessionmaker)
         except:
-            log.warning('No valid database connection. Execute `pyuniprot connection` on command line')
+            log.warning('No valid database connection. Execute `pyhgnc connection` on command line')
 
     def _create_tables(self, checkfirst=True):
         """creates all tables from models in your database
@@ -89,11 +92,12 @@ class BaseDbManager(object):
 class DbManager(BaseDbManager):
     enzymes = {}
     gene_families = {}
-    refseq_accessions = {}
+    refseqs = {}
     mgds = {}
     uniprots = {}
     pubmeds = {}
     enas = {}
+    rgds = {}
 
     def __init__(self, connection=None):
         """The DbManager implements all function to upload HGNC data into the database. Prefered SQL Alchemy
@@ -105,11 +109,12 @@ class DbManager(BaseDbManager):
 
         super(DbManager, self).__init__(connection=connection)
 
-    def db_import(self, silent=False, from_path=None):
+    def db_import(self, silent=False, from_path=None, low_memory=False):
         self._drop_tables()
         self._create_tables()
         json_data = DbManager.load_hgnc_json(from_path)
-        self.insert_data(hgnc_dict=json_data, silent=silent)
+        self.insert_hgnc(hgnc_dict=json_data, silent=silent, low_memory=low_memory)
+        self.insert_hcop(silent=silent)
 
     @classmethod
     def get_date(cls, hgnc, key):
@@ -126,7 +131,7 @@ class DbManager(BaseDbManager):
                 alias_symbols.append(models.AliasSymbol(alias_symbol=alias))
         if 'prev_symbol' in hgnc:
             for prev in hgnc['prev_symbol']:
-                alias_symbols.append(models.AliasSymbol(alias_symbol=prev, isprev=True))
+                alias_symbols.append(models.AliasSymbol(alias_symbol=prev, is_previous_symbol=True))
         return alias_symbols
 
     @classmethod
@@ -139,7 +144,7 @@ class DbManager(BaseDbManager):
 
         if 'prev_name' in hgnc:
             for prev in hgnc['prev_name']:
-                alias_names.append(models.AliasName(alias_name=prev, isprev=True))
+                alias_names.append(models.AliasName(alias_name=prev, is_previous_name=True))
 
         return alias_names
 
@@ -161,18 +166,18 @@ class DbManager(BaseDbManager):
 
         return gene_families
 
-    def get_refseq_accessions(self, hgnc):
-        refseq_accessions = []
+    def get_refseq(self, hgnc):
+        refseqs = []
 
         if 'refseq_accession' in hgnc:
             for accession in hgnc['refseq_accession']:
 
-                if accession not in self.refseq_accessions:
-                    self.refseq_accessions[accession] = models.RefSeq(accession=accession)
+                if accession not in self.refseqs:
+                    self.refseqs[accession] = models.RefSeq(accession=accession)
 
-                refseq_accessions.append(self.refseq_accessions[accession])
+                refseqs.append(self.refseqs[accession])
 
-        return refseq_accessions
+        return refseqs
 
     def get_mgds(self, hgnc):
         mgds = []
@@ -195,8 +200,12 @@ class DbManager(BaseDbManager):
         if 'rgd_id' in hgnc:
 
             for rgd in hgnc['rgd_id']:
-                rgdid = int(rgd.split(':')[-1])
-                rgds.append(models.RGD(rgdid=rgdid))
+
+                if rgd not in self.rgds:
+                    rgdid = int(rgd.split(':')[-1])
+                    self.rgds[rgd] = models.RGD(rgdid=rgdid)
+
+                rgds.append(self.rgds[rgd])
 
         return rgds
 
@@ -217,9 +226,9 @@ class DbManager(BaseDbManager):
             for uniprot in hgnc['uniprot_ids']:
 
                 if uniprot not in self.uniprots:
-                    self.uniprots[uniprot] = models.Uniprot(uniprotid=uniprot)
+                    self.uniprots[uniprot] = models.UniProt(uniprotid=uniprot)
 
-            uniprots.append(self.uniprots[uniprot])
+                uniprots.append(self.uniprots[uniprot])
 
         return uniprots
 
@@ -262,8 +271,9 @@ class DbManager(BaseDbManager):
 
         if 'lsdb' in hgnc:
 
-            for lsdb in hgnc['lsdb']:
-                lsdbs.append(models.LSDB(lsdb=lsdb))
+            for lsdb_url in hgnc['lsdb']:
+                lsdb, url = lsdb_url.split('|')
+                lsdbs.append(models.LSDB(lsdb=lsdb, url=url))
 
         return lsdbs
 
@@ -281,7 +291,9 @@ class DbManager(BaseDbManager):
 
         return enzymes
 
-    def insert_data(self, hgnc_dict, silent=False):
+    def insert_hgnc(self, hgnc_dict, silent=False, low_memory=False):
+
+        log.info('low_memory set to {}'.format(low_memory))
 
         for hgnc_data in tqdm(hgnc_dict['docs'], disable=silent):
             hgnc_table = {
@@ -289,6 +301,7 @@ class DbManager(BaseDbManager):
                 'identifier': int(hgnc_data['hgnc_id'].split(':')[-1]),
                 'name': hgnc_data['name'],
                 'status': hgnc_data['status'],
+                'orphanet': hgnc_data.get('orphanet'),
                 'uuid': hgnc_data['uuid'],
                 'locus_group': hgnc_data['locus_group'],
                 'locus_type': hgnc_data['locus_type'],
@@ -301,11 +314,10 @@ class DbManager(BaseDbManager):
                 'iuphar': hgnc_data.get('iuphar'),
                 'ucsc': hgnc_data.get('ucsc_id'),
                 'snornabase': hgnc_data.get('snornabase'),
-                'intermediatefilamentdb': hgnc_data.get('intermediate_filament_db'),
                 'pseudogeneorg': hgnc_data.get('pseudogene.org'),
                 'bioparadigmsslc': hgnc_data.get('bioparadigms_slc'),
                 'locationsortable': hgnc_data.get('location_sortable'),
-                'merop': hgnc_data.get('merops'),
+                'merops': hgnc_data.get('merops'),
                 'location': hgnc_data.get('location'),
                 'cosmic': hgnc_data.get('cosmic'),
                 'imgt': hgnc_data.get('imgt'),
@@ -316,12 +328,12 @@ class DbManager(BaseDbManager):
                 'alias_symbols': self.get_alias_symbols(hgnc_data),
                 'alias_names': self.get_alias_names(hgnc_data),
                 'gene_families': self.get_gene_families(hgnc_data),
-                'refseq_accessions': self.get_refseq_accessions(hgnc_data),
+                'refseqs': self.get_refseq(hgnc_data),
                 'mgds': self.get_mgds(hgnc_data),
                 'rgds': self.get_rgds(hgnc_data),
                 'omims': self.get_omims(hgnc_data),
                 'uniprots': self.get_uniprots(hgnc_data),
-                'ccds': self.get_ccds(hgnc_data),
+                'ccdss': self.get_ccds(hgnc_data),
                 'pubmeds': self.get_pubmeds(hgnc_data),
                 'enas': self.get_enas(hgnc_data),
                 'lsdbs': self.get_lsdbs(hgnc_data),
@@ -329,11 +341,50 @@ class DbManager(BaseDbManager):
             }
 
             self.session.add(models.HGNC(**hgnc_table))
+            if low_memory:
+                self.session.flush()
 
         if not silent:
-            print('load data into database')
+            print('Insert HGNC data into database')
 
         self.session.commit()
+
+    def insert_hcop(self, silent=False):
+
+        log_text = 'Load OrthologyPrediction data from {}'.format(constants.HCOP_GZIP)
+        log.info(log_text)
+        if not silent:
+            print(log_text)
+
+        df_hcop = pandas.read_table(constants.HCOP_GZIP, low_memory=False)
+        df_hcop.replace('-', numpy.NaN, inplace=True)
+        df_hcop.replace(to_replace={'hgnc_id': 'HGNC:'}, value='', regex=True, inplace=True)
+        df_hcop.hgnc_id = df_hcop.hgnc_id.fillna(-1).astype(int)
+        df_hcop.rename(columns={'hgnc_id': 'identifier'}, inplace=True)
+        df_hcop.set_index('identifier', inplace=True)
+
+        log_text = 'Join HGNC with HGNC'
+        log.info(log_text)
+        if not silent:
+            print(log_text)
+
+        data = self.session.query(models.HGNC).options(load_only(models.HGNC.id, models.HGNC.identifier))
+        data = [{'hgnc_id': x.id, 'identifier': x.identifier} for x in data]
+        df_hgnc = pandas.DataFrame(data)
+        df_hgnc.set_index('identifier', inplace=True)
+
+        df_hcnp4db = df_hcop.join(df_hgnc)
+        df_hcnp4db.reset_index(inplace=True)
+        df_hcnp4db.index += 1
+        df_hcnp4db.drop('identifier', axis=1, inplace=True)
+        df_hcnp4db.index.rename('id', inplace=True)
+
+        log_text = 'Load OrthologyPrediction data in database'
+        log.info(log_text)
+        if not silent:
+            print(log_text)
+
+        df_hcnp4db.to_sql(name=models.OrthologyPrediction.__tablename__, con=self.connection, if_exists='append')
 
     @staticmethod
     def load_hgnc_json(from_path=None):
@@ -349,15 +400,47 @@ class DbManager(BaseDbManager):
         return hgnc_dict['response']
 
 
-def update(connection=None, silent=False, from_path=None):
+def update(connection=None, silent=False, from_path=None, low_memory=False):
+    """Update the database with current version of HGNC
+
+    :param str connection: conncetion string
+    :param bool silent: silent while import
+    :param str from_path: import from path
+    :param bool low_memory: set to `True` if you have low memory
+    :return:
+    """
     database = DbManager(connection)
-    database.db_import(silent=silent, from_path=from_path)
+    database.db_import(silent=silent, from_path=from_path, low_memory=low_memory)
     database.session.close()
 
 
 def set_connection(connection=defaults.sqlalchemy_connection_string_default):
-    """
-    Set the connection string for sqlalchemy and write it to the config file.
+    """Set the connection string for sqlalchemy and write it to the config file.
+
+    .. code-block:: python
+
+        import pyhgnc
+        pyhgnc.set_connection('mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}')
+
+
+    .. hint::
+
+        valid connection strings
+
+        - mysql+pymysql://user:passwd@localhost/database?charset=utf8
+
+        - postgresql://scott:tiger@localhost/mydatabase
+
+        - mssql+pyodbc://user:passwd@database
+
+        - oracle://user:passwd@127.0.0.1:1521/database
+
+        - Linux: sqlite:////absolute/path/to/database.db
+
+        - Windows: sqlite:///C:\path\to\database.db
+
+
+
     :param str connection: sqlalchemy connection string
     """
     config_path = defaults.config_file_path
@@ -375,16 +458,18 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
             config.write(configfile)
 
 
-def set_mysql_connection(host='localhost', user='pyuniprot_user', passwd='pyuniprot_passwd', db='pyuniprot',
+def set_mysql_connection(host='localhost', user='pyhgnc_user', passwd='pyhgnc_passwd', db='pyhgnc',
                          charset='utf8'):
     """Method to set a MySQL connection
 
-    :param host: MySQL database host
-    :param user: MySQL database user
-    :param passwd: MySQL database password
-    :param db: MySQL database name
-    :param charset: MySQL database charater set
-    :return: None
+    :param str host: MySQL database host
+    :param str user: MySQL database user
+    :param str passwd: MySQL database password
+    :param str db: MySQL database name
+    :param str charset: MySQL database charater set
+
+    :return: connection string
+    :rtype: str
     """
     connection_string = 'mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'.format(
         host=host,

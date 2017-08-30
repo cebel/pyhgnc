@@ -22,3 +22,4 @@ DEFAULT_DB_NAME = 'pyhgnc.db'
 DEFAULT_DB_LOCATION = os.path.join(PYHGNC_DATA_DIR, DEFAULT_DB_NAME)
 
 HGNC_JSON = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/hgnc_complete_set.json"
+HCOP_GZIP = 'ftp://ftp.ebi.ac.uk/pub/databases/genenames/hcop/human_all_hcop_sixteen_column.txt.gz'

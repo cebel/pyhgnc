@@ -16,7 +16,11 @@ INSTALL_REQUIRES = [
     'configparser',
     'tqdm',
     'click',
-    'pandas'
+    'pandas',
+    'flasgger',
+    'flask',
+    'passlib',
+    'wtforms'
 ]
 
 ENTRY_POINTS = {
