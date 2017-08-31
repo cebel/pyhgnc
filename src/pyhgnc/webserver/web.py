@@ -637,7 +637,7 @@ def orthology_prediction():
         allowed_str_args=allowed_str_args
     )
 
-    return jsonify(query.orthology_prediction(**args))
+    return jsonify(query.orthology_prediction(**args)), 200, {'ContentType':'application/json'}
 
 
 @app.route("/api/query/alias_symbol/", methods=['GET', 'POST'])
