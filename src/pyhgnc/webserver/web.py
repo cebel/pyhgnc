@@ -46,6 +46,7 @@ app.config.setdefault('SWAGGER', {
     },
     'version': '0.1.0',
 })
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 swagger = Swagger(app)
 query = QueryManager()
