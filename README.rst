@@ -267,8 +267,7 @@ Links
 -----
 Universal Protein Resource (UniProt)
 
-- `UniProt website <http://www.uniprot.org/>`_
-- `About UniProt <http://www.uniprot.org/help/about>`_
+- `HGNC website <http://www.genenames.org/>`_
 
 PyHGNC
 

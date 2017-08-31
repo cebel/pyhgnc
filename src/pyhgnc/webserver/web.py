@@ -9,11 +9,35 @@ from .. import __title__ as project_title
 
 app = Flask(__name__)
 
-app.debug = False
+app.debug = True
+
+swagger_description = """
+<table><tr><td>![alt text](../static/images/project_logo.png)</td><td>
+This exposes the functions of [PyHGNC](https://pypi.python.org/pypi/pyhgnc) as a RESTful API. PyHGNC is a Python library
+which allows to store and query HGNC data in a local database. [HGNC](http://www.genenames.org/) provides 
+unique symbols and names for human loci, including protein coding genes, ncRNA genes and pseudogenes. 
+Documentation of the software you can find [here](http://pyhgnc.readthedocs.io/en/latest/). PyHGNC
+and its RESTful API also allows access to [HGNC Orthology Predictions (HCOP)](http://www.genenames.org/cgi-bin/hcop) 
+(predictions from [eggNOG](http://eggnog.embl.de), [Ensembl Compara](http://www.ensembl.org/info/genome/compara), 
+[HGNC](http://www.genenames.org), [HomoloGene](https://www.ncbi.nlm.nih.gov/homologene), 
+[Inparanoid](http://inparanoid.sbc.su.se), 
+[NCBI Gene Orthology](https://www.ncbi.nlm.nih.gov/books/NBK3841/#EntrezGene.General_Gene_Information), 
+[OMA](http://omabrowser.org), [OrthoDB](http://www.orthodb.org), [OrthoMCL](http://orthomcl.org/orthomcl), 
+[Panther](http://www.pantherdb.org), [PhylomeDB](http://phylomedb.org), [TreeFam](http://www.treefam.org), 
+[ZFIN](http://zfin.org)) with the API function **get_api_query_orthology_prediction**.
+</td>
+</tr></table>
+<table><tr>
+    <td>![alt text](../static/images/imi_logo.png)</td>
+    <td>![alt text](../static/images/aetionomy_logo.png)</td>
+    <td>![alt text](../static/images/phago_logo.png)</td>
+    <td>![alt text](../static/images/scai_logo.png)</td>
+<tr>
+"""
 
 app.config.setdefault('SWAGGER', {
     'title': 'PyHGNC Web API',
-    'description': 'This exposes the functions of PyHGNC as a RESTful API',
+    'description': swagger_description,
     'contact': {
         'responsibleOrganization': 'Fraunhofer SCAI',
         'responsibleDeveloper': 'Christian Ebeling',
@@ -463,6 +487,8 @@ def alias_name():
 def orthology_prediction():
     """
     Returns list of HGNC entries by query paramaters
+
+    <a href="http://test.de">rst test </a>
     ---
 
     tags:
@@ -471,20 +497,138 @@ def orthology_prediction():
 
     parameters:
 
-      - name: name
+      - name: ortholog_species
+        in: query
+        type: integer
+        required: false
+        description: 'NCBI taxonomy identifier'
+        default: 10090
+
+      - name: human_entrez_gene
+        in: query
+        type: integer
+        required: false
+        description: 'Human Entrey gene identifier'
+        default: 351
+
+      - name: human_ensembl_gene
         in: query
         type: string
         required: false
-        description: 'HGNC approved name for the gene'
-        default: 'lysine demethylase 1A'
-    """
-    allowed_str_args = ['name', 'symbol', 'status', 'uuid', 'locus_group', 'locus_type',
-                        'date_name_changed', 'date_modified', 'date_symbol_changed', 'date_approved_reserved',
-                        'ensembl_gene', 'vega', 'lncrnadb', 'horde', 'mirbase', 'iuphar', 'ucsc', 'snornabase',
-                        'pseudogeneorg', 'bioparadigmsslc', 'locationsortable', 'merops', 'location', 'cosmic', 'imgt'
-                        ]
+        description: 'Human Ensembl gene identifier'
+        default: 'ENSG00000142192'
 
-    allowed_int_args = ['limit', 'identifier', 'orphanet', 'entrez', ]
+      - name: human_name
+        in: query
+        type: string
+        required: false
+        description: 'Human gene name'
+        default: 'amyloid beta precursor protein'
+
+      - name: human_symbol
+        in: query
+        type: string
+        required: false
+        description: 'Human gene symbol'
+        default: 'APP'
+
+      - name: human_chr
+        in: query
+        type: string
+        required: false
+        description: 'Human gene chromosome location'
+        default: '21q21.3'
+
+      - name: human_assert_ids
+        in: query
+        type: string
+        required: false
+        description: 'human cross references'
+        default: '%P05067%'
+
+      - name: ortholog_species_entrez_gene
+        in: query
+        type: integer
+        required: false
+        description: 'Ortholog species Entrez gene identifier'
+        default: 11820
+
+      - name: ortholog_species_ensembl_gene
+        in: query
+        type: string
+        required: false
+        description: 'Ortholog species Ensembl gene identifier'
+        default: 'ENSMUSG00000022892'
+
+      - name: ortholog_species_db_id
+        in: query
+        type: string
+        required: false
+        description: 'Ortholog species database identifier'
+        default: 'MGI:88059'
+
+      - name: ortholog_species_name
+        in: query
+        type: string
+        required: false
+        description: 'Ortholog species gene name'
+        default: 'amyloid beta (A4) precursor protein'
+
+      - name: ortholog_species_symbol
+        in: query
+        type: string
+        required: false
+        description: 'Ortholog species gene symbol'
+        default: 
+
+      - name: ortholog_species_chr
+        in: query
+        type: string
+        required: false
+        description: 'Ortholog species gene chromosome location'
+        default: 16
+
+      - name: ortholog_species_assert_ids
+        in: query
+        type: string
+        required: false
+        description: 'ortholog species cross references'
+        default: '%P12023%'
+
+      - name: support
+        in: query
+        type: string
+        required: false
+        description: 'Support on HGNC website'
+        default: '%OrthoDB%'
+
+      - name: hgnc_symbol
+        in: query
+        type: string
+        required: false
+        description: 'HGNC symbol'
+        default: 'APP'
+
+      - name: hgnc_identifier
+        in: query
+        type: integer
+        required: false
+        description: 'HGNC identifier'
+        default: 620
+
+      - name: limit
+        in: query
+        type: integer
+        required: false
+        default: 1
+    """
+    allowed_str_args = ['ortholog_species', 'human_entrez_gene', 'human_ensembl_gene', 'human_name', 'human_symbol',
+                        'human_chr', 'human_assert_ids', 'ortholog_species_entrez_gene',
+                        'ortholog_species_ensembl_gene', 'ortholog_species_db_id', 'ortholog_species_name',
+                        'ortholog_species_symbol', 'ortholog_species_chr', 'ortholog_species_assert_ids', 'support',
+                        'hgnc_symbol', 'hgnc_identifier']
+
+    allowed_int_args = ['limit', 'ortholog_species']
 
     args = get_args(
         request_args=request.args,
@@ -492,7 +636,7 @@ def orthology_prediction():
         allowed_str_args=allowed_str_args
     )
 
-    return jsonify(query.hgnc(**args))
+    return jsonify(query.orthology_prediction(**args))
 
 
 @app.route("/api/query/alias_symbol/", methods=['GET', 'POST'])
