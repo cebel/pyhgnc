@@ -20,7 +20,8 @@ INSTALL_REQUIRES = [
     'flasgger',
     'flask',
     'passlib',
-    'wtforms'
+    'wtforms',
+    'flask-cors'
 ]
 
 ENTRY_POINTS = {

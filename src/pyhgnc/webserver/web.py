@@ -3,11 +3,13 @@ from functools import wraps
 from flask import Flask, jsonify, request, render_template, flash, redirect, url_for, session
 from passlib.hash import sha256_crypt
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from flask_cors import CORS
 from ..manager.models import AppUser
 from ..manager.query import QueryManager
 from .. import __title__ as project_title
 
 app = Flask(__name__)
+CORS(app)
 
 app.debug = True
 
@@ -47,6 +49,8 @@ app.config.setdefault('SWAGGER', {
     'version': '0.1.0',
 })
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
+
 
 swagger = Swagger(app)
 query = QueryManager()
@@ -637,7 +641,7 @@ def orthology_prediction():
         allowed_str_args=allowed_str_args
     )
 
-    return jsonify(query.orthology_prediction(**args)), 200, {'ContentType':'application/json'}
+    return jsonify(query.orthology_prediction(**args))
 
 
 @app.route("/api/query/alias_symbol/", methods=['GET', 'POST'])
