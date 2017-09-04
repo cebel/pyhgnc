@@ -32,7 +32,7 @@ and its RESTful API also allows access to [HGNC Orthology Predictions (HCOP)](ht
 <table><tr>
     <td>![alt text](../static/images/imi_logo.png)</td>
     <td>![alt text](../static/images/aetionomy_logo.png)</td>
-    <td>![alt text](../static/images/phago_logo.png)</td>
+    <td>![alt text](../static/images/phago_logo.jpeg)</td>
     <td>![alt text](../static/images/scai_logo.png)</td>
 <tr>
 """

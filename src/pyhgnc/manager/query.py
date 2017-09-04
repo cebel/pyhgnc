@@ -2,6 +2,7 @@ from .database import BaseDbManager
 from collections import Iterable
 from pandas import read_sql
 from . import models
+import sqlalchemy
 
 
 class QueryManager(BaseDbManager):
@@ -29,7 +30,11 @@ class QueryManager(BaseDbManager):
             results = read_sql(query.statement, self.engine)
 
         else:
-            results = query.all()
+            try:
+                results = query.all()
+            except sqlalchemy.exec.Statement.Error:
+                query.session.rollback()
+                results = query.all()
 
         return results
 
@@ -118,7 +123,7 @@ class QueryManager(BaseDbManager):
              pseudogeneorg=None, bioparadigmsslc=None, locationsortable=None, ec_number=None, refseq_accession=None,
              merops=None, location=None, cosmic=None, imgt=None, enaid=None, alias_symbol=None, alias_name=None,
              rgdid=None, omimid=None, ccdsid=None, lsdbs=None, ortholog_species=None, gene_family_identifier=None,
-             hgnc_symbol=None, hgnc_identifier=None, limit=None, as_df=False):
+             limit=None, as_df=False):
         """Method to query :class:`pyhgnc.manager.models.Pmid`
 
 
@@ -318,8 +323,6 @@ class QueryManager(BaseDbManager):
             (ccdsid, models.CCDS.ccdsid),
             (lsdbs, models.LSDB.lsdb),
             (ortholog_species, models.OrthologyPrediction.ortholog_species),
-            #(hgnc_identifier, models.HGNC.identifier),
-            #(hgnc_symbol, models.HGNC.symbol),
         )
         q = self.get_one_to_many_queries(q, one_to_many_queries_config)
 

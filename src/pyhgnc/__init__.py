@@ -22,7 +22,7 @@ query = QueryManager
 
 __all__ = ['update', 'query']
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 __title__ = 'PyHGNC'
 __description__ = 'Importing and querying HGNC data'
@@ -32,4 +32,5 @@ __author__ = 'Andrej Konotopez'
 __email__ = 'Andrej.Konotopez@scai.fraunhofer.de'
 
 __license__ = 'Apache 2.0 License'
-__copyright__ = 'Copyright (c) 2017 Andrej Konotopez, Fraunhofer Institute for Algorithms and Scientific Computing SCAI, Schloss Birlinghoven, 53754 Sankt Augustin, Germany'
+__copyright__ = 'Copyright (c) 2017 Andrej Konotopez, Fraunhofer Institute for Algorithms and Scientific ' \
+                'Computing SCAI, Schloss Birlinghoven, 53754 Sankt Augustin, Germany'
