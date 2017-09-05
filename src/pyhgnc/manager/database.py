@@ -109,12 +109,12 @@ class DbManager(BaseDbManager):
 
         super(DbManager, self).__init__(connection=connection)
 
-    def db_import(self, silent=False, from_path=None, low_memory=False):
+    def db_import(self, silent=False, hgnc_file_path=None, hcop_file_path=None, low_memory=False):
         self._drop_tables()
         self._create_tables()
-        json_data = DbManager.load_hgnc_json(from_path)
+        json_data = DbManager.load_hgnc_json(hgnc_file_path=hgnc_file_path)
         self.insert_hgnc(hgnc_dict=json_data, silent=silent, low_memory=low_memory)
-        self.insert_hcop(silent=silent)
+        self.insert_hcop(silent=silent, hcop_file_path=hcop_file_path)
 
     @classmethod
     def get_date(cls, hgnc, key):
@@ -349,14 +349,14 @@ class DbManager(BaseDbManager):
 
         self.session.commit()
 
-    def insert_hcop(self, silent=False):
+    def insert_hcop(self, silent=False, hcop_file_path=None):
 
         log_text = 'Load OrthologyPrediction data from {}'.format(constants.HCOP_GZIP)
         log.info(log_text)
         if not silent:
             print(log_text)
 
-        df_hcop = pandas.read_table(constants.HCOP_GZIP, low_memory=False)
+        df_hcop = pandas.read_table((hcop_file_path or constants.HCOP_GZIP), low_memory=False)
         df_hcop.replace('-', numpy.NaN, inplace=True)
         df_hcop.replace(to_replace={'hgnc_id': 'HGNC:'}, value='', regex=True, inplace=True)
         df_hcop.hgnc_id = df_hcop.hgnc_id.fillna(-1).astype(int)
@@ -387,11 +387,11 @@ class DbManager(BaseDbManager):
         df_hcnp4db.to_sql(name=models.OrthologyPrediction.__tablename__, con=self.connection, if_exists='append')
 
     @staticmethod
-    def load_hgnc_json(from_path=None):
+    def load_hgnc_json(hgnc_file_path=None):
 
-        if from_path:
-            with open(from_path) as response:
-                log.info('loading json data from {}'.format(from_path))
+        if hgnc_file_path:
+            with open(hgnc_file_path) as response:
+                log.info('loading json data from {}'.format(hgnc_file_path))
                 hgnc_dict = json.loads(response.read())
         else:
             response = request.urlopen(HGNC_JSON)
@@ -400,17 +400,18 @@ class DbManager(BaseDbManager):
         return hgnc_dict['response']
 
 
-def update(connection=None, silent=False, from_path=None, low_memory=False):
+def update(connection=None, silent=False, hgnc_file_path=None, hcop_file_path=None, low_memory=False):
     """Update the database with current version of HGNC
 
     :param str connection: conncetion string
     :param bool silent: silent while import
-    :param str from_path: import from path
+    :param str hgnc_file_path: import from path HGNC
+    :param str hcop_file_path: import from path HCOP (orthologs)
     :param bool low_memory: set to `True` if you have low memory
     :return:
     """
     database = DbManager(connection)
-    database.db_import(silent=silent, from_path=from_path, low_memory=low_memory)
+    database.db_import(silent=silent, hgnc_file_path=hgnc_file_path, hcop_file_path=hcop_file_path, low_memory=low_memory)
     database.session.close()
 
 

@@ -1,0 +1,156 @@
+{
+    "responseHeader": {
+        "status": 0,
+        "QTime": 17
+    },
+    "response": {
+        "numFound": 42382,
+        "docs": [
+            {
+                "gene_family": [
+                    "Immunoglobulin like domain containing"
+                ],
+                "date_approved_reserved": "1989-06-30",
+                "vega_id": "OTTHUMG00000183507",
+                "locus_group": "protein-coding gene",
+                "status": "Approved",
+                "_version_": 1577129174679683072,
+                "uuid": "fe3e34f6-c539-4337-82c1-1b4e8c115992",
+                "merops": "I43.950",
+                "refseq_accession": [
+                    "NM_130786"
+                ],
+                "locus_type": "gene with protein product",
+                "gene_family_id": [
+                    594
+                ],
+                "cosmic": "A1BG",
+                "hgnc_id": "HGNC:5",
+                "rgd_id": [
+                    "RGD:69417"
+                ],
+                "ensembl_gene_id": "ENSG00000121410",
+                "entrez_id": "1",
+                "omim_id": [
+                    "138670"
+                ],
+                "symbol": "A1BG",
+                "location": "19q13.43",
+                "name": "alpha-1-B glycoprotein",
+                "date_modified": "2015-07-13",
+                "mgd_id": [
+                    "MGI:2152878"
+                ],
+                "ucsc_id": "uc002qsd.5",
+                "uniprot_ids": [
+                    "P04217"
+                ],
+                "ccds_id": [
+                    "CCDS12976"
+                ],
+                "pubmed_id": [
+                    2591067
+                ],
+                "location_sortable": "19q13.43"
+            },
+            {
+                "date_approved_reserved": "2009-07-20",
+                "vega_id": "OTTHUMG00000183508",
+                "locus_group": "non-coding RNA",
+                "status": "Approved",
+                "alias_symbol": [
+                    "FLJ23569"
+                ],
+                "_version_": 1577129174682828800,
+                "uuid": "e685b501-bb03-48d1-8475-308746689aaf",
+                "prev_name": [
+                    "non-protein coding RNA 181",
+                    "A1BG antisense RNA (non-protein coding)",
+                    "A1BG antisense RNA 1 (non-protein coding)"
+                ],
+                "refseq_accession": [
+                    "NR_015380"
+                ],
+                "locus_type": "RNA, long non-coding",
+                "hgnc_id": "HGNC:37133",
+                "rna_central_ids": [
+                    "URS00007E4F6E"
+                ],
+                "ensembl_gene_id": "ENSG00000268895",
+                "entrez_id": "503538",
+                "symbol": "A1BG-AS1",
+                "date_name_changed": "2012-08-15",
+                "location": "19q13.43",
+                "name": "A1BG antisense RNA 1",
+                "date_modified": "2013-06-27",
+                "ucsc_id": "uc002qse.3",
+                "prev_symbol": [
+                    "NCRNA00181",
+                    "A1BGAS",
+                    "A1BG-AS"
+                ],
+                "ena": [
+                    "BC040926"
+                ],
+                "date_symbol_changed": "2010-11-25",
+                "location_sortable": "19q13.43"
+            },
+            {
+                "gene_family": [
+                    "RNA binding motif containing"
+                ],
+                "date_approved_reserved": "2007-11-23",
+                "vega_id": "OTTHUMG00000018240",
+                "locus_group": "protein-coding gene",
+                "status": "Approved",
+                "alias_symbol": [
+                    "ACF",
+                    "ASP",
+                    "ACF64",
+                    "ACF65",
+                    "APOBEC1CF"
+                ],
+                "_version_": 1577129174683877376,
+                "uuid": "a4c5c522-7338-4421-858c-06860c6e7da8",
+                "refseq_accession": [
+                    "NM_014576"
+                ],
+                "locus_type": "gene with protein product",
+                "gene_family_id": [
+                    725
+                ],
+                "cosmic": "A1CF",
+                "hgnc_id": "HGNC:24086",
+                "rgd_id": [
+                    "RGD:619834"
+                ],
+                "ensembl_gene_id": "ENSG00000148584",
+                "entrez_id": "29974",
+                "symbol": "A1CF",
+                "location": "10q11.23",
+                "name": "APOBEC1 complementation factor",
+                "date_modified": "2016-10-05",
+                "mgd_id": [
+                    "MGI:1917115"
+                ],
+                "ucsc_id": "uc057tgv.1",
+                "uniprot_ids": [
+                    "Q9NQ94"
+                ],
+                "ccds_id": [
+                    "CCDS7241",
+                    "CCDS7242",
+                    "CCDS7243",
+                    "CCDS73133"
+                ],
+                "ena": [
+                    "AF271790"
+                ],
+                "pubmed_id": [
+                    11815617,
+                    11072063
+                ],
+                "location_sortable": "10q11.23"
+            }
+	]}
+}

@@ -4,8 +4,8 @@ import logging
 import os
 import sys
 import time
-
 import click
+from . import constants
 
 from .webserver.web import get_app
 from .constants import PYHGNC_DIR
@@ -30,13 +30,12 @@ Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 
 log = logging.getLogger('pyhgnc')
 
-
 logging.basicConfig(format='%(name)s:%(levelname)s - %(message)s')
 
 fh_path = os.path.join(PYHGNC_DIR, time.strftime('pyhgnc_%Y_%m_%d_%H_%M_%S.txt'))
 fh = logging.FileHandler(fh_path)
 fh.setLevel(logging.DEBUG)
-#fh.setFormatter(formatter)
+
 log.addHandler(fh)
 
 hint_connection_string = [
@@ -72,23 +71,32 @@ def main():
 @main.command()
 @click.option('-c', '--connection', help='SQL Alchemy connection string')
 @click.option('-s', '--silent', help="True if want no output (e.g. cron job)", is_flag=True)
-@click.option('-p', '--from_path', help="Load data from path")
+@click.option('--hgnc_file_path', help="Load data from path HGNC")
+@click.option('--hcop_file_path', help="Load data from path HCOP")
 @click.option('-l', '--low_memory', help="set this if you have very low memory available", is_flag=True)
-def update(connection, silent, from_path, low_memory):
+def update(connection, silent, hgnc_file_path, hcop_file_path, low_memory):
     """Update the database"""
-    database.update(connection=connection, silent=silent, from_path=from_path, low_memory=low_memory)
+    database.update(connection=connection,
+                    silent=silent,
+                    hgnc_file_path=hgnc_file_path,
+                    hcop_file_path=hcop_file_path,
+                    low_memory=low_memory)
 
 
 @main.command(help="Set SQL Alchemy connection string, change default " +
                    "configuration. Without any option, sqlite will be set as default.")
-@click.option('-c', '--connection')
+@click.option('-c', '--connection',
+              prompt="set connection",
+              default="sqlite:///"+constants.DEFAULT_DB_LOCATION,
+              help="path to location")
 def setcon(connection):
     """Set the connection string"""
     database.set_connection(connection)
+    test_connection(connection)
 
 
-@main.command(help="Set SQL Alchemy connection string, change default " +
-                   "configuration. Without any option, sqlite will be set as default.")
+@main.command(help="Set MySQL Alchemy connection string, change default " +
+                   "configuration.")
 @click.option('-h', '--host', prompt="server name/ IP address database is hosted",
               default='localhost', help="host / servername")
 @click.option('-u', '--user', prompt="MySQL/MariaDB user", default='pyhgnc_user', help="MySQL/MariaDB user")
