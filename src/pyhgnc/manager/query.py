@@ -32,7 +32,7 @@ class QueryManager(BaseDbManager):
         else:
             try:
                 results = query.all()
-            except sqlalchemy.exec.Statement.Error:
+            except:
                 query.session.rollback()
                 results = query.all()
 
