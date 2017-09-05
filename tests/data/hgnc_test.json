@@ -54,46 +54,61 @@
                 "location_sortable": "19q13.43"
             },
             {
-                "date_approved_reserved": "2009-07-20",
-                "vega_id": "OTTHUMG00000183508",
-                "locus_group": "non-coding RNA",
-                "status": "Approved",
-                "alias_symbol": [
-                    "FLJ23569"
+                "gene_family":[
+                    "Zinc fingers SWIM-type"
                 ],
-                "_version_": 1577129174682828800,
-                "uuid": "e685b501-bb03-48d1-8475-308746689aaf",
-                "prev_name": [
-                    "non-protein coding RNA 181",
-                    "A1BG antisense RNA (non-protein coding)",
-                    "A1BG antisense RNA 1 (non-protein coding)"
+                "date_approved_reserved":"2001-07-17",
+                "vega_id":"OTTHUMG00000074023",
+                "locus_group":"protein-coding gene",
+                "status":"Approved",
+                "alias_symbol":[
+                    "dJ337O18.5"
                 ],
-                "refseq_accession": [
-                    "NR_015380"
+                "_version_":1577673023950946311,
+                "uuid":"b4cfefce-d664-458c-808e-5dd2422690f7",
+                "prev_name":[
+                    "chromosome 20 open reading frame 162"
                 ],
-                "locus_type": "RNA, long non-coding",
-                "hgnc_id": "HGNC:37133",
-                "rna_central_ids": [
-                    "URS00007E4F6E"
+                "refseq_accession":[
+                    "NM_080603"
                 ],
-                "ensembl_gene_id": "ENSG00000268895",
-                "entrez_id": "503538",
-                "symbol": "A1BG-AS1",
-                "date_name_changed": "2012-08-15",
-                "location": "19q13.43",
-                "name": "A1BG antisense RNA 1",
-                "date_modified": "2013-06-27",
-                "ucsc_id": "uc002qse.3",
-                "prev_symbol": [
-                    "NCRNA00181",
-                    "A1BGAS",
-                    "A1BG-AS"
+                "locus_type":"gene with protein product",
+                "gene_family_id":[
+                    90
                 ],
-                "ena": [
-                    "BC040926"
+                "cosmic":"ZSWIM1",
+                "hgnc_id":"HGNC:16155",
+                "rgd_id":[
+                    "RGD:1305715"
                 ],
-                "date_symbol_changed": "2010-11-25",
-                "location_sortable": "19q13.43"
+                "ensembl_gene_id":"ENSG00000168612",
+                "entrez_id":"90204",
+                "symbol":"ZSWIM1",
+                "date_name_changed":"2016-02-15",
+                "location":"20q13.12",
+                "name":"zinc finger SWIM-type containing 1",
+                "date_modified":"2016-02-15",
+                "mgd_id":[
+                    "MGI:1919221"
+                ],
+                "ucsc_id":"uc010ghi.4",
+                "prev_symbol":[
+                    "C20orf162"
+                ],
+                "uniprot_ids":[
+                    "Q9BR11"
+                ],
+                "ccds_id":[
+                    "CCDS13382"
+                ],
+                "ena":[
+                    "AL008726"
+                ],
+                "date_symbol_changed":"2003-12-19",
+                "pubmed_id":[
+                    24508175
+                ],
+                "location_sortable":"20q13.12"
             },
             {
                 "gene_family": [
