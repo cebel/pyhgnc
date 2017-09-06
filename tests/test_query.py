@@ -181,8 +181,9 @@ class TestQuery(unittest.TestCase):
 
     def test_query_ref_seq(self):
         A1CF_ref_seq = {
-            'hgnc_symbol': "A1CF",
-            'hgnc_identifier': 24086,
+            'hgnc_symbols': [
+                "A1CF"
+            ],
             'accession': "NM_014576"
         }
         ref_seq = self.query.ref_seq(hgnc_symbol="A1CF")[0]
