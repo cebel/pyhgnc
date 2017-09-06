@@ -351,7 +351,7 @@ class DbManager(BaseDbManager):
 
     def insert_hcop(self, silent=False, hcop_file_path=None):
 
-        log_text = 'Load OrthologyPrediction data from {}'.format(constants.HCOP_GZIP)
+        log_text = 'Load OrthologyPrediction data from {}'.format((hcop_file_path or constants.HCOP_GZIP))
         log.info(log_text)
         if not silent:
             print(log_text)

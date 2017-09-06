@@ -9,8 +9,8 @@ import datetime
 import pyhgnc
 
 from pandas.core.frame import DataFrame
-from pyhgnc.constants import PYHGNC_DATA_DIR
-from pyhgnc.manager.defaults import sqlalchemy_connection_string_4_tests
+from pyhgnc.constants import PYHGNC_TEST_DATA_DIR
+from pyhgnc.manager.defaults import sqlalchemy_connection_string_4_tests, DEFAULT_TEST_DATABASE_LOCATION
 from pyhgnc.manager import models
 
 from pyhgnc.manager.query import QueryManager
@@ -21,46 +21,92 @@ log = logging.getLogger(__name__)
 class TestQuery(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        this_path = os.path.dirname(os.path.realpath(__file__))
-        #pyhgnc.manager.defaults.XML_DIR_NAME = os.path.join(this_path, "data")
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        test_data = os.path.join(dir_path, 'data')
+        hgnc_test_file = os.path.join(test_data, 'hgnc_test.json')
+        hcop_test_file = os.path.join(test_data, 'hcop_test.txt')
 
-        #conn = sqlalchemy_connection_string_4_tests
-        #pyhgnc.update(connection=conn)
-        #cls.query = QueryManager(connection=conn)
-        cls.query = QueryManager()
+        test_connection = sqlalchemy_connection_string_4_tests
+
+        pyhgnc.update(connection=test_connection, hgnc_file_path=hgnc_test_file, hcop_file_path=hcop_test_file)
+        cls.query = QueryManager(connection=test_connection)
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(PYHGNC_DATA_DIR)
         cls.query.session.close()
-        pass
+        if os.path.isfile(DEFAULT_TEST_DATABASE_LOCATION):
+            os.remove(DEFAULT_TEST_DATABASE_LOCATION)
 
     def test_number_of_inserts(self):
         models_list = [
-            (models.HGNC, 8),
-            (models.AliasSymbol, 3),
-            (models.AliasName, 1),
-            (models.GeneFamily, 184),
-            (models.RefSeq, 1),
-            (models.RGD, 1),
+            (models.HGNC, 3),
+            (models.AliasSymbol, 7),    # Alias symbol and previous symbol
+            (models.AliasName, 1),      # Alias name and previous name
+            (models.GeneFamily, 3),
+            (models.RefSeq, 3),
+            (models.RGD, 3),
             (models.OMIM, 1),
-            (models.MGD, 4),
-            (models.UniProt, 74),
-            (models.CCDS, 4),
-            (models.PubMed, 29),
-            (models.ENA, 5),
-            (models.Enzyme, 4),
-            (models.LSDB, 18),
-            (models.OrthologyPrediction, 4),
+            (models.MGD, 3),
+            (models.UniProt, 3),
+            (models.CCDS, 6),
+            (models.PubMed, 4),
+            (models.ENA, 2),
+            (models.Enzyme, 0),
+            (models.LSDB, 0),
+            (models.OrthologyPrediction, 70),
         ]
         for model, num_of_results in models_list:
             self.assertEqual(num_of_results, self.query.session.query(model).count())
 
     def test_query_hgnc(self):
-        pass
+        A1BG_dict = {
+            'bioparadigmsslc': None,
+            'cosmic': 'A1BG',
+            'date_approved_reserved': '1989-06-30',
+            'date_modified': '2015-07-13',
+            'date_name_changed': None,
+            'date_symbol_changed': None,
+            'ensembl_gene': 'ENSG00000121410',
+            'entrez': '1',
+            'horde': None,
+            'identifier': 5,
+            'imgt': None,
+            'iuphar': None,
+            'lncrnadb': None,
+            'location': '19q13.43',
+            'locationsortable': '19q13.43',
+            'locus_group': 'protein-coding gene',
+            'locus_type': 'gene with protein product',
+            'merops': 'I43.950',
+            'mirbase': None,
+            'name': 'alpha-1-B glycoprotein',
+            'orphanet': None,
+            'pseudogeneorg': None,
+            'snornabase': None,
+            'status': 'Approved',
+            'symbol': 'A1BG',
+            'ucsc': 'uc002qsd.5',
+            'uuid': 'fe3e34f6-c539-4337-82c1-1b4e8c115992',
+            'vega': 'OTTHUMG00000183507'
+        }
+
+        hgnc = self.query.hgnc(symbol="A1BG")[0]
+        self.assertIsInstance(hgnc, models.HGNC)
+        self.assertEqual(hgnc.symbol, "A1BG")
+        self.assertEqual(hgnc.to_dict(), A1BG_dict)
+
+        hgnc_df = self.query.hgnc(symbol="A1BG", as_df=True)
+        self.assertIsInstance(hgnc_df, DataFrame)
 
     def test_query_orthology_prediction(self):
-        pass
+        orthology_predictions = self.query.orthology_prediction(hgnc_identifier=5)
+        self.assertEqual(len(orthology_predictions), 24)
+
+        for prediction in orthology_predictions:
+            self.assertIsInstance(prediction, models.OrthologyPrediction)
+
+        orthology_predictions_df = self.query.orthology_prediction(as_df=True)
+        self.assertIsInstance(orthology_predictions_df, DataFrame)
 
     def test_query_alias_symbol(self):
         pass
