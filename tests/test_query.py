@@ -9,7 +9,6 @@ import datetime
 import pyhgnc
 
 from pandas.core.frame import DataFrame
-from pyhgnc.constants import PYHGNC_TEST_DATA_DIR
 from pyhgnc.manager.defaults import sqlalchemy_connection_string_4_tests, DEFAULT_TEST_DATABASE_LOCATION
 from pyhgnc.manager import models
 
@@ -109,276 +108,193 @@ class TestQuery(unittest.TestCase):
         self.assertIsInstance(orthology_predictions_df, DataFrame)
 
     def test_query_alias_symbol(self):
-        pass
+        ZSWIM1_aliases = [
+            {
+                'hgnc_symbol': 'ZSWIM1',
+                'hgnc_identifier': 16155,
+                'alias_symbol': "dJ337O18.5",
+                'is_previous_symbol': False
+            },
+            {
+                'hgnc_symbol': 'ZSWIM1',
+                'hgnc_identifier': 16155,
+                'alias_symbol': "C20orf162",
+                'is_previous_symbol': True
+            }
+        ]
+
+        aliases = self.query.alias_symbol(hgnc_symbol="ZSWIM1")
+        for alias in aliases:
+            self.assertIsInstance(alias, models.AliasSymbol)
+            self.assertIn(alias.to_dict(), ZSWIM1_aliases)
 
     def test_query_alias_name(self):
-        pass
+        ZSWIM1_aliases = [{
+            'hgnc_symbol': 'ZSWIM1',
+            'hgnc_identifier': 16155,
+            'alias_name': "chromosome 20 open reading frame 162",
+            'is_previous_name': True
+        }]
+
+        alias = self.query.alias_name(hgnc_symbol="ZSWIM1")[0]
+        self.assertIsInstance(alias, models.AliasName)
+        self.assertIn(alias.to_dict(), ZSWIM1_aliases)
 
     def test_query_gene_family(self):
-        pass
+        families = [
+            {
+                'family_identifier': 594,
+                'family_name': 'Immunoglobulin like domain containing',
+                'hgnc_symbols': [
+                    'A1BG'
+                ]
+            },
+            {
+                'family_identifier': 90,
+                'family_name': 'Zinc fingers SWIM-type',
+                'hgnc_symbols': [
+                    'ZSWIM1'
+                ]
+            },
+            {
+                'family_identifier': 725,
+                'family_name': 'RNA binding motif containing',
+                'hgnc_symbols': [
+                    'A1CF'
+                ]
+            }
+        ]
+
+        gene_families = self.query.gene_family()
+        for family in gene_families:
+            self.assertIsInstance(family, models.GeneFamily)
+            self.assertIn(family.to_dict(), families)
+
+        A1BG_family = self.query.gene_family(hgnc_identifier=5)[0]
+        self.assertEqual(A1BG_family.to_dict(), families[0])
+
+        ZSWIM1_family = self.query.gene_family(hgnc_symbol="ZSWIM1")[0]
+        self.assertEqual(ZSWIM1_family.to_dict(), families[1])
+
+        A1CF_family = self.query.gene_family(family_identifier=725)[0]
+        self.assertEqual(A1CF_family.to_dict(), families[2])
 
     def test_query_ref_seq(self):
-        pass
+        A1CF_ref_seq = {
+            'hgnc_symbol': "A1CF",
+            'hgnc_identifier': 24086,
+            'accession': "NM_014576"
+        }
+        ref_seq = self.query.ref_seq(hgnc_symbol="A1CF")[0]
+
+        self.assertIsInstance(ref_seq, models.RefSeq)
+        self.assertEqual(ref_seq.to_dict(), A1CF_ref_seq)
 
     def test_query_rgd(self):
-        pass
+        ZSQIM1_rgd = {
+            'rgdid': 1305715,
+            'hgnc_symbols': [
+                'ZSWIM1'
+            ]
+        }
+        rgd = self.query.rgd(rgdid=1305715)[0]
+        self.assertIsInstance(rgd, models.RGD)
+        self.assertEqual(rgd.to_dict(), ZSQIM1_rgd)
 
     def test_query_omim(self):
-        pass
+        A1BG_omim = {
+            'hgnc_symbol': "A1BG",
+            'hgnc_identifier': 5,
+            'omimid': 138670
+        }
+
+        omim = self.query.omim(hgnc_identifier=5)[0]
+        self.assertIsInstance(omim, models.OMIM)
+        self.assertEqual(omim.to_dict(), A1BG_omim)
 
     def test_query_mgd(self):
-        pass
+        A1CF_mgd = {
+            'hgnc_symbols': [
+                "A1CF"
+            ],
+            'mgdid': 1917115
+        }
+
+        mgd = self.query.mgd(hgnc_symbol="A1CF")[0]
+        self.assertIsInstance(mgd, models.MGD)
+        self.assertEqual(mgd.to_dict(), A1CF_mgd)
 
     def test_query_uniprot(self):
-        pass
+        A1CF_uniprot = {
+            'hgnc_symbols': [
+                "A1CF"
+            ],
+            'uniprotid': "Q9NQ94"
+        }
+
+        uniprot = self.query.uniprot(hgnc_identifier=24086)[0]
+        self.assertIsInstance(uniprot, models.UniProt)
+        self.assertEqual(uniprot.to_dict(), A1CF_uniprot)
 
     def test_query_ccds(self):
-        pass
+        A1CF_ccds = [
+            {
+                'hgnc_symbol': "A1CF",
+                'hgnc_identifier': 24086,
+                'ccdsid': "CCDS7241"
+            },
+            {
+                'hgnc_symbol': "A1CF",
+                'hgnc_identifier': 24086,
+                'ccdsid': "CCDS7242"
+            },
+            {
+                'hgnc_symbol': "A1CF",
+                'hgnc_identifier': 24086,
+                'ccdsid': "CCDS7243"
+            },
+            {
+                'hgnc_symbol': "A1CF",
+                'hgnc_identifier': 24086,
+                'ccdsid': "CCDS73133"
+            },
+        ]
+
+        ccds = self.query.ccds(hgnc_identifier=24086)
+
+        for ccd in ccds:
+            self.assertIsInstance(ccd, models.CCDS)
+            self.assertIn(ccd.to_dict(), A1CF_ccds)
 
     def test_query_pubmed(self):
-        pass
+        A1CF_pubmeds = [
+            {
+                'hgnc_symbols': [
+                    "A1CF"
+                ],
+                'pubmedid': 11815617
+            },
+            {
+                'hgnc_symbols': [
+                    "A1CF"
+                ],
+                'pubmedid': 11072063
+            }
+        ]
+
+        pubmeds = self.query.pubmed(hgnc_symbol="A1CF")
+        for pubmed in pubmeds:
+            self.assertIsInstance(pubmed, models.PubMed)
+            self.assertIn(pubmed.to_dict(), A1CF_pubmeds)
 
     def test_query_ena(self):
-        pass
+        A1CF_ena = {
+            'hgnc_symbols': [
+                "A1CF"
+            ],
+            'enaid': "AF271790"
+        }
 
-    def test_query_enzyme(self):
-        pass
-
-    def test_query_lsdb(self):
-        pass
-
-
-
-    # def test_query_accession(self):
-    #     accessions = self.query.accession(entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     accession = accessions[0]
-    #     self.assertEqual(isinstance(accession, models.Accession), True)
-    #     self.assertEqual(accession.accession, 'P50129')
-    #
-    #     df = self.query.accession(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_alternative_full_name(self):
-    #     alternative_full_names = self.query.alternative_full_name(
-    #         name='Serotonin receptor 2A',
-    #         entry_name='5HT2A_PIG',
-    #         limit=1,
-    #         as_df=False
-    #     )
-    #
-    #     alternative_full_name = alternative_full_names[0]
-    #     self.assertEqual(isinstance(alternative_full_name, models.AlternativeFullName), True)
-    #     self.assertEqual(alternative_full_name.name, 'Serotonin receptor 2A')
-    #
-    #     df = self.query.alternative_full_name(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_alternative_short_name(self):
-    #     alternative_short_names = self.query.alternative_short_name(entry_name='AAH_ARATH', limit=1, as_df=False)
-    #
-    #     alternative_short_name = alternative_short_names[0]
-    #     self.assertEqual(isinstance(alternative_short_name, models.AlternativeShortName), True)
-    #     self.assertEqual(alternative_short_name.name, 'AtAAH')
-    #
-    #     df = self.query.alternative_short_name(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_db_reference(self):
-    #     db_references = self.query.db_reference(entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     db_reference = db_references[0]
-    #     self.assertEqual(isinstance(db_reference, models.DbReference), True)
-    #
-    #     self.assertEqual((db_reference.identifier, db_reference.type_), ('S78208', 'EMBL'))
-    #
-    #     df = self.query.db_reference(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_disease(self):
-    #     diseases = self.query.disease(ref_id='177900', limit=1, as_df=False)
-    #
-    #     disease = diseases[0]
-    #     self.assertEqual(isinstance(disease, models.Disease), True)
-    #     self.assertEqual(disease.name, 'Psoriasis 1')
-    #
-    #     df = self.query.disease(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_disease_comment(self):
-    #     disease_comments = self.query.disease_comment(entry_name='1C06_HUMAN', limit=1, as_df=False)
-    #
-    #     disease_comment = disease_comments[0]
-    #     self.assertEqual(isinstance(disease_comment, models.DiseaseComment), True)
-    #
-    #     expected_comment = "Disease susceptibility is associated with variations affecting the " \
-    #                        "gene represented in this entry."
-    #
-    #     self.assertEqual(disease_comment.comment, expected_comment)
-    #
-    #     df = self.query.disease_comment(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_ec_number(self):
-    #     ec_numbers = self.query.ec_number(entry_name='AAH_ARATH', limit=1, as_df=False)
-    #
-    #     ec_number = ec_numbers[0]
-    #     self.assertEqual(isinstance(ec_number, models.ECNumber), True)
-    #     self.assertEqual(ec_number.ec_number, '3.5.3.9')
-    #
-    #     df = self.query.ec_number(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_entry(self):
-    #     entries = self.query.entry(name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     entry = entries[0]
-    #     self.assertEqual(isinstance(entry, models.Entry), True)
-    #
-    #     expected_entry = {
-    #         'created': datetime.date(1996, 10, 1),
-    #         'dataset': 'Swiss-Prot',
-    #         'gene_name': 'HTR2A',
-    #         'modified': datetime.date(2017, 5, 10),
-    #         'name': '5HT2A_PIG',
-    #         'recommended_full_name': '5-hydroxytryptamine receptor 2A',
-    #         'recommended_short_name': '5-HT-2',
-    #         'taxid': 9823,
-    #         'version': 111}
-    #
-    #     for attribute, value in expected_entry.items():
-    #         print(entry.__getattribute__(attribute))
-    #         self.assertEqual(entry.__getattribute__(attribute), value)
-    #
-    #     df = self.query.entry(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_feature(self):
-    #     features = self.query.feature(entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     feature = features[0]
-    #     self.assertEqual(isinstance(feature, models.Feature), True)
-    #
-    #     expected_feature = {
-    #         'description': '5-hydroxytryptamine receptor 2A',
-    #         'identifier': 'PRO_0000068949',
-    #         'type_': 'chain'}
-    #
-    #     for attribute, value in expected_feature.items():
-    #         print(feature.__getattribute__(attribute))
-    #         self.assertEqual(feature.__getattribute__(attribute), value)
-    #
-    #     df = self.query.feature(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_function(self):
-    #     functions = self.query.function(entry_name='001R_FRG3G', limit=1, as_df=False)
-    #     function_ = functions[0]
-    #     self.assertEqual(isinstance(function_, models.Function), True)
-    #     self.assertEqual(function_.text, 'Transcription activation.')
-    #
-    #     df = self.query.function(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_keyword(self):
-    #     keywords = self.query.keyword(identifier='KW-0085', limit=1, as_df=False)
-    #
-    #     keyword = keywords[0]
-    #     self.assertEqual(isinstance(keyword, models.Keyword), True)
-    #     self.assertEqual(keyword.name, 'Behavior')
-    #
-    #     df = self.query.keyword(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_pmid(self):
-    #     pmids = self.query.pmid( entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     pmid = pmids[0]
-    #     self.assertEqual(isinstance(pmid, models.Pmid), True)
-    #
-    #     expected_pmid = {
-    #         'date': 1995,
-    #         'first': '201',
-    #         'last': '206',
-    #         'name': 'Biochim. Biophys. Acta',
-    #         'pmid': 7794950,
-    #         'title': 'Species differences in 5-HT2A receptors: cloned pig and rhesus monkey 5-HT2A receptors reveal '
-    #                  'conserved transmembrane homology to the human rather than rat sequence.',
-    #         'volume': 1236}
-    #
-    #     for attribute, value in expected_pmid.items():
-    #         print(pmid.__getattribute__(attribute))
-    #         self.assertEqual(pmid.__getattribute__(attribute), value)
-    #
-    #     df = self.query.pmid(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_sequence(self):
-    #     sequences = self.query.sequence(entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     sequence = sequences[0]
-    #     self.assertEqual(isinstance(sequence, models.Sequence), True)
-    #     self.assertEqual(sequence.sequence[-10:], 'NTVNEKVSCV')
-    #
-    #     df = self.query.sequence(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_subcellular_location(self):
-    #     subcellular_locations = self.query.subcellular_location(entry_name='AAH_ARATH', limit=1, as_df=False)
-    #
-    #     subcellular_location = subcellular_locations[0]
-    #     self.assertEqual(isinstance(subcellular_location, models.SubcellularLocation), True)
-    #     self.assertEqual(subcellular_location.location, 'Endoplasmic reticulum')
-    #
-    #     df = self.query.subcellular_location(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_tissue_in_reference(self):
-    #     tissue_in_references = self.query.tissue_in_reference(entry_name='5HT2A_PIG', limit=1, as_df=False)
-    #
-    #     tissue_in_reference = tissue_in_references[0]
-    #     self.assertEqual(isinstance(tissue_in_reference, models.TissueInReference), True)
-    #     self.assertEqual(tissue_in_reference.tissue, 'Pulmonary artery')
-    #
-    #     df = self.query.tissue_in_reference(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_query_tissue_specificity(self):
-    #     tissue_specificities = self.query.tissue_specificity(entry_name='AAH_ARATH', limit=1, as_df=False)
-    #
-    #     tissue_specificity = tissue_specificities[0]
-    #     self.assertEqual(isinstance(tissue_specificity, models.TissueSpecificity), True)
-    #     self.assertEqual(tissue_specificity.comment, 'Expressed in seedlings, roots, stems, leaves, '
-    #                                                    'flowers, siliques and seeds.')
-    #
-    #     df = self.query.tissue_specificity(limit=1, as_df=True)
-    #     self.assertEqual(isinstance(df, DataFrame), True)
-    #
-    # def test_prop_dbreference_types(self):
-    #     self.assertEqual(len(self.query.dbreference_types), 60)
-    #
-    # def test_prop_taxids(self):
-    #     self.assertEqual(set(self.query.taxids), set([9823, 3702, 9606, 654924]))
-    #
-    # def test_prop_datasets(self):
-    #     self.assertEqual(self.query.datasets, ['Swiss-Prot'])
-    #
-    # def test_feature_types(self):
-    #     self.assertEqual(len(self.query.feature_types), 15)
-    #
-    # def test_subcellular_locations(self):
-    #     self.assertEqual(len(self.query.subcellular_locations), 8)
-    #
-    # def test_tissues_in_references(self):
-    #     self.assertEqual(set(self.query.tissues_in_references), set(['Blood', 'Liver', 'Pulmonary artery']))
-    #
-    # def test_keywords(self):
-    #     self.assertEqual(len(self.query.keywords), 29)
-    #
-    # def test_diseases(self):
-    #     self.assertEqual(self.query.diseases, ['Psoriasis 1'])
-    #
-    # def test_version(self):
-    #     expected_version = set(['Swiss-Prot:1968_12:1968-12-06', 'TrEMBL:2003_04:2003-04-25'])
-    #     query_set = set([str(x) for x in self.query.version])
-    #     self.assertEqual(expected_version, query_set)
+        ena = self.query.ena(hgnc_symbol="A1CF")[0]
+        self.assertIsInstance(ena, models.ENA)
+        self.assertEqual(ena.to_dict(), A1CF_ena)
