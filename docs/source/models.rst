@@ -1,8 +1,8 @@
 Data Models
 ===========
 
-`PyUniProt` uses `SQLAlchemy <http://www.sqlalchemy.org/>`_ to store the data in the database.
-Use instance of :class:`pyhgnc.manager.query.QueryManager` to query the content of the database.
+`PyHGNC` uses `SQLAlchemy <http://www.sqlalchemy.org/>`_ to store the data in the database.
+You can use an instance of :class:`pyhgnc.manager.query.QueryManager` to query the content of the database.
 
 Entity–relationship model:
 

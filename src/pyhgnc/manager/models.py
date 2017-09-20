@@ -1,4 +1,4 @@
-"""This file contains the relational database models used by HGNC."""
+"""This file contains the relational database models used by PyHGNC."""
 
 import datetime
 
@@ -14,8 +14,7 @@ Base = declarative_base()
 def foreign_key_to(table_name):
     """Creates a standard foreign key to a table in the database
 
-    :param table_name: name of the table without TABLE_PREFIX
-    :type table_name: str
+    :param str table_name: name of the table without TABLE_PREFIX
     :return: foreign key column
     :rtype: sqlalchemy.Column
     """
@@ -24,6 +23,12 @@ def foreign_key_to(table_name):
 
 
 def get_many2many_table(table1, table2):
+    """Creates a many-to-many table that links the given tables table1 and table2.
+
+    :param str table1: Tablename of left hand table without TABLE_PREFIX.
+    :param str table2: Tablename of right hand table without TABLE_PREFIX.
+    :return:
+    """
     table_name = ('{}{}__{}'.format(TABLE_PREFIX, table1, table2))
     return Table(table_name, Base.metadata,
                  Column('{}_id'.format(table1), Integer, ForeignKey('{}{}.id'.format(TABLE_PREFIX, table1))),
@@ -64,7 +69,6 @@ class MasterModel(object):
 
     def to_dict_with_hgncs(self):
         ret_dict = self._to_dict()
-        # ret_dict['hgnc_identifier'] = self.hgnc.identifier
         ret_dict['hgnc_symbols'] = [x.symbol for x in self.hgncs]
         return ret_dict
 
@@ -104,14 +108,14 @@ class HGNC(Base, MasterModel):
 
     :cvar str name: HGNC approved name for the gene. Equates to the "APPROVED NAME" field within the gene symbol report
     :cvar str symbol: The HGNC approved gene symbol. Equates to the "APPROVED SYMBOL" field within the gene symbol
-                        report.
+                        report
     :cvar int orphanet: Orphanet ID
-    :cvar str identifier: HGNC ID. A unique ID created by the HGNC for every approved symbol
+    :cvar str identifier: Unique ID created by the HGNC for every approved symbol (HGNC ID)
     :cvar str status: Status of the symbol report, which can be either "Approved" or "Entry Withdrawn"
     :cvar str uuid: universally unique identifier
 
-    :cvar str locus_group: group name for a set of related locus types as defined by the HGNC (e.g. non-coding RNA).
-    :cvar str locus_type: locus type as defined by the HGNC (e.g. RNA, transfer)
+    :cvar str locus_group: Group name for a set of related locus types as defined by the HGNC (e.g. non-coding RNA)
+    :cvar str locus_type: Locus type as defined by the HGNC (e.g. RNA, transfer)
 
     :cvar date date_name_changed: date the gene name was last changed
     :cvar date date_modified: date the entry was last modified
@@ -299,9 +303,7 @@ class AliasName(Base, MasterModel):
 
 class GeneFamily(Base, MasterModel):
     """Name and identifier given to a gene family or group the gene has been assigned to.
-    Equates to the "GENE FAMILY" field within
-    the gene symbol report.
-
+    Equates to the "GENE FAMILY" field within the gene symbol report.
 
     :cvar int familyid: family identifier
     :cvar str familyname: family name
@@ -325,9 +327,9 @@ class GeneFamily(Base, MasterModel):
 
 
 class RefSeq(Base, MasterModel):
-    """RefSeq nucleotide accession(s). Found within the"NUCLEOTIDE SEQUENCES" section of the gene symbol report
+    """RefSeq nucleotide accession(s). Found within the"NUCLEOTIDE SEQUENCES" section of the gene symbol report.
 
-    See also `RefSeq database <https://www.ncbi.nlm.nih.gov/refseq/>`_ for more information
+    See also `RefSeq database <https://www.ncbi.nlm.nih.gov/refseq/>`_ for more information.
 
     :cvar str accession: RefSeq accession number
     :cvar list hgncs: back populates to :class:`.HGNC`
@@ -409,16 +411,12 @@ class MGD(Base, MasterModel):
 
 class UniProt(Base, MasterModel):
     """Universal Protein Resource (UniProt) protein accession.
-    Found within the "PROTEIN RESOURCES" section of the gene symbol report
+    Found within the "PROTEIN RESOURCES" section of the gene symbol report.
 
-    .. note::
-
-        use `pip install pyhgnc` to install PyHGNC Python library from Fraunhofer SCAI BIO
+    See also `UniProt webpage <http://www.uniprot.org>`_ for more information.
 
     :cvar str uniprotid: UniProt identifier
     :cvar list hgncs: back populates to :class:`.HGNC`
-
-    see also `UniProt webpage <http://www.uniprot.org>`_ for more information
     """
 
     uniprotid = Column(String(255))
@@ -437,9 +435,9 @@ class UniProt(Base, MasterModel):
 
 
 class CCDS(Base, MasterModel):
-    """Consensus CDS ID. Found within the "NUCLEOTIDE SEQUENCES" section of the gene symbol report
+    """Consensus CDS ID. Found within the "NUCLEOTIDE SEQUENCES" section of the gene symbol report.
 
-    see also `CCDS <https://www.ncbi.nlm.nih.gov/projects/CCDS>`_ for more information
+    See also `CCDS <https://www.ncbi.nlm.nih.gov/projects/CCDS>`_ for more information.
 
     :cvar str ccdsid: CCDS identifier
     :cvar hgnc: back populates to :class:`.HGNC`
@@ -458,7 +456,7 @@ class CCDS(Base, MasterModel):
 
 
 class PubMed(Base, MasterModel):
-    """Pubmed and Europe Pubmed Central PMID
+    """PubMed and Europe PubMed Central PMID
 
     :cvar str pubmedid: Pubmed identifier
     :cvar list hgncs: back populates to :class:`.HGNC`
