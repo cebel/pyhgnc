@@ -97,6 +97,7 @@ class HGNC(Base, MasterModel):
 
         - homeodb (Homeobox Database ID)
         - horde_id (Symbol used within HORDE for the gene)
+
         described in
         `README <ftp://ftp.ebi.ac.uk/pub/databases/genenames/README.txt>`_, but not found in
         `HGNC JSON file <ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/hgnc_complete_set.json>`_

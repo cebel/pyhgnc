@@ -894,7 +894,7 @@ class QueryManager(BaseDbManager):
     def enzyme(self, ec_number=None, hgnc_symbol=None, hgnc_identifier=None, limit=None, as_df=False):
         """Method to query :class:`.models.Enzyme` objects in database
 
-        :param ec_number:Enzyme Commission number (EC number)(s)
+        :param ec_number: Enzyme Commission number (EC number)(s)
         :type ec_number: str or tuple(str) or None
 
         :param hgnc_symbol: HGNC symbol(s)
