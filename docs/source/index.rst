@@ -46,9 +46,7 @@ PyHGNC is an ongoing project and needs improvement. We are happy if you want to 
 a scientific cooperation with us.
 
 
-.. figure:: _static/models/all.png
-   :target: _images/all.png
-   :alt: ER model of PyHGNC database
+ToDo: Add Figure of PyHGNC ER
 
 **Fig. 1**: ER model of PyHGNC database
 
