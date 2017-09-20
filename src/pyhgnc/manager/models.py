@@ -2,7 +2,7 @@
 
 import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Date, Table
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Date, Table, Unicode
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
 
@@ -158,7 +158,7 @@ class HGNC(Base, MasterModel):
     :cvar list enas: relationship to ENA
     """
     name = Column(String(255), nullable=True)
-    symbol = Column(String(255), index=True)
+    symbol = Column(Unicode(255, collation='utf8_bin'), index=True)
     identifier = Column(Integer, unique=True)
     status = Column(String(255))
     uuid = Column(String(255))
@@ -263,7 +263,7 @@ class AliasSymbol(Base, MasterModel):
     :cvar hgnc: back populates to :class:`.HGNC`
     """
 
-    alias_symbol = Column(String(255))
+    alias_symbol = Column(Unicode(255, collation='utf8_bin'))
     is_previous_symbol = Column(Boolean, default=False)
 
     hgnc_id = foreign_key_to('hgnc')
@@ -572,14 +572,14 @@ class OrthologyPrediction(Base, MasterModel):
     human_entrez_gene = Column(Integer)
     human_ensembl_gene = Column(String(255))
     human_name = Column(String(255))
-    human_symbol = Column(String(255))
+    human_symbol = Column(Unicode(255, collation='utf8_bin'))
     human_chr = Column(String(255))
     human_assert_ids = Column(String(255))
     ortholog_species_entrez_gene = Column(Integer)
     ortholog_species_ensembl_gene = Column(String(255))
     ortholog_species_db_id = Column(String(255))
     ortholog_species_name = Column(Text)
-    ortholog_species_symbol = Column(String(255))
+    ortholog_species_symbol = Column(Unicode(255, collation='utf8_bin'), index=True)
     ortholog_species_chr = Column(String(255))
     ortholog_species_assert_ids = Column(String(255))
     support = Column(String(255))

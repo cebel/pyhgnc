@@ -348,7 +348,7 @@ class QueryManager(BaseDbManager):
                              hgnc_symbol=None,
                              limit=None,
                              as_df=False):
-        """Method to query :class:`pyhgnc.manager.models.Pmid`
+        """Method to query :class:`pyhgnc.manager.models.OrthologyPrediction`
 
         :param int ortholog_species: NCBI taxonomy identifier
         :param str human_entrez_gene: Entrez gene identifier
