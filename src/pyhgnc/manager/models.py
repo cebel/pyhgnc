@@ -158,7 +158,8 @@ class HGNC(Base, MasterModel):
     :cvar list enas: relationship to ENA
     """
     name = Column(String(255), nullable=True)
-    symbol = Column(Unicode(255, collation='utf8_bin'), index=True)
+    #, collation='utf8_bin'
+    symbol = Column(Unicode(255), index=True)
     identifier = Column(Integer, unique=True)
     status = Column(String(255))
     uuid = Column(String(255))
@@ -262,8 +263,8 @@ class AliasSymbol(Base, MasterModel):
     :cvar bool is_previous_symbol: previously approved
     :cvar hgnc: back populates to :class:`.HGNC`
     """
-
-    alias_symbol = Column(Unicode(255, collation='utf8_bin'))
+    # , collation='utf8_bin'
+    alias_symbol = Column(Unicode(255))
     is_previous_symbol = Column(Boolean, default=False)
 
     hgnc_id = foreign_key_to('hgnc')
@@ -572,14 +573,18 @@ class OrthologyPrediction(Base, MasterModel):
     human_entrez_gene = Column(Integer)
     human_ensembl_gene = Column(String(255))
     human_name = Column(String(255))
-    human_symbol = Column(Unicode(255, collation='utf8_bin'))
+
+    # , collation='utf8_bin'
+    human_symbol = Column(Unicode(255))
     human_chr = Column(String(255))
     human_assert_ids = Column(String(255))
     ortholog_species_entrez_gene = Column(Integer)
     ortholog_species_ensembl_gene = Column(String(255))
     ortholog_species_db_id = Column(String(255))
     ortholog_species_name = Column(Text)
-    ortholog_species_symbol = Column(Unicode(255, collation='utf8_bin'), index=True)
+
+    # , collation='utf8_bin'
+    ortholog_species_symbol = Column(Unicode(255), index=True)
     ortholog_species_chr = Column(String(255))
     ortholog_species_assert_ids = Column(String(255))
     support = Column(String(255))
