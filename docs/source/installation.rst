@@ -118,18 +118,11 @@ To update from Python shell:
     import pyhgnc
     pyhgnc.update()
 
-To make sure that the latest HGNC/HCOP version is used, use the parameter `force_download`
-
-.. code-block:: python
-
-    import pyhgnc
-    pyhgnc.update(force_download=True)
-
 Changing database configuration
 -------------------------------
 
-Following functions allow to change the connection to you RDBMS (relational database management system). Next
-time you will use :code:`pyhgnc` by default this connection will be used.
+Following functions allow to change the connection to your RDBMS (relational database management system). The connection
+settings will be used by default on the next time :code:`pyhgnc` is executed.
 
 To set a new MySQL/MariaDB connection use the interactive command line interface (bash, terminal, cmd) ...
 
@@ -144,7 +137,7 @@ To set a new MySQL/MariaDB connection use the interactive command line interface
     import pyhgnc
     pyhgnc.set_mysql_connection(host='localhost', user='pyhgnc_user', passwd='pyhgnc_passwd', db='pyhgnc')
 
-To set connection to other database systems use the :func:`.database.set_connection` function.
+To set connection to other database systems use the :func:`.database.set_connection`.
 
 For more information about connection strings go to
 the `SQLAlchemy documentation <http://docs.sqlalchemy.org/en/latest/core/engines.html>`_.
@@ -157,6 +150,8 @@ Examples for valid connection strings are:
 - oracle://user:passwd@127.0.0.1:1521/database
 - Linux: sqlite:////absolute/path/to/database.db
 - Windows: sqlite:///C:\\path\\to\\database.db
+
+You could use the following code to connect `pyhgnc` to an oracle database:
 
 .. code-block:: python
 
