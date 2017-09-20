@@ -132,7 +132,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'PyHGNC.tex', 'PyHGNC Documentation',
-     'Christian Ebeling & Andreje Konotopez', 'manual'),
+     'Christian Ebeling & Andrej Konotopez', 'manual'),
 ]
 
 

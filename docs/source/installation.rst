@@ -9,8 +9,8 @@ After complete installation of HGNC (gene symbols and names) and HCOP (orthology
 
 Tests were performed on *Ubuntu 16.04, 4 x Intel Core i7-6560U CPU @ 2.20Ghz* with
 *16 GiB of RAM*. In general PyHGNC should work also on other systems like Windows,
-other Linux distributions or Mac OS. Installation were complete after ~4 min. For system
-with lower memory we have added the option `--low_memory` in the update method.
+other Linux distributions or Mac OS. Installation were complete after ~4 min. For systems
+with low memory the option `--low_memory` was added in the update method.
 
 .. _rdbms:
 
@@ -18,27 +18,26 @@ Supported databases
 -------------------
 
 `PyHGNC` uses `SQLAlchemy <http://sqlalchemy.readthedocs.io>`_ to cover a wide spectrum of RDMSs
-(Relational database management system). For best performance MySQL or MariaDB is recommended. But if you have no
+(Relational database management systems). For best performance MySQL or MariaDB is recommended. But if you have no
 possibility to install software on your system, SQLite - which needs no further
-installation - also works. Following RDMSs are supported (by SQLAlchemy):
+installation - also works. The following RDMSs are supported (by SQLAlchemy):
 
-1. Firebird
-2. Microsoft SQL Server
-3. MySQL / `MariaDB <https://mariadb.org/>`_
-4. Oracle
-5. PostgreSQL
-6. SQLite
+1. `Firebird <https://www.firebirdsql.org/en/start/>`_
+2. `Microsoft SQL Server <https://www.microsoft.com/en-us/sql-server/>`_
+3. `MySQL <https://www.mysql.com/>`_ / `MariaDB <https://mariadb.org/>`_
+4. `Oracle <https://www.oracle.com/database/index.html>`_
+5. `PostgreSQL <https://www.postgresql.org/>`_
+6. `SQLite <https://www.sqlite.org/>`_
 7. Sybase
 
 Install software
 ----------------
 
-The following instructions are written for Linux/MacOS. The way you install python software on Windows could be a
-little bit different.
+The following instructions are written for Linux/MacOS. The way you install python software on Windows could be different.
 
-Often is make sense to avoid conflicts with other python installations by using different virtual environments. More
-information about an easy way to manage different virtual environments you find
-`here <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_.
+Often it makes sense to avoid conflicts with other python installations by using different virtual environments.
+Read `here <http://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ about easy setup and management of
+different virtual environments.
 
 * If you want to install `pyhgnc` system wide use superuser (sudo for Ubuntu):
 
@@ -62,7 +61,7 @@ information about an easy way to manage different virtual environments you find
 MySQL/MariaDB setup
 ~~~~~~~~~~~~~~~~~~~
 
-In general you don't have to setup any database, because by default `pyhgnc` uses file based SQLite. But we strongly
+In general you don't have to setup any database, because `pyhgnc` uses file based SQLite by default. But we strongly
 recommend to use MySQL/MariaDB.
 
 Log in MySQL/MariaDB as root user and create a new database, create a user, assign the rights and flush privileges.
@@ -73,13 +72,13 @@ Log in MySQL/MariaDB as root user and create a new database, create a user, assi
     GRANT ALL PRIVILEGES ON pyhgnc.* TO 'pyhgnc_user'@'%' IDENTIFIED BY 'pyhgnc_passwd';
     FLUSH PRIVILEGES;
 
-The simplest way to set eth configurations for MySQL/MariaDB is use use the command ...
+The simplest way to set the configurations of `pyhgnc` for MySQL/MariaDB is to use the command ...
 
 .. code-block:: sh
 
     pyhgnc mysql
 
-... and except all default values.
+... and accept all default values.
 
 Another way is to open a python shell and set the MySQL configuration. If you have not changed
 anything in the SQL statements ...
@@ -102,17 +101,17 @@ Updating
 During the updating process PyHGNC will download HGNC and HCOP files from the
 `EBI ftp server <ftp://ftp.ebi.ac.uk/pub/databases/genenames>`_.
 
-Download files will take no space on your disk after the update process.
+Downloaded files will take no space on your disk after the update process.
 
-To update execute the following command in the shell
+To update from command line or terminal:
 
 .. code-block:: sh
 
     pyhgnc update
 
-More options are available with `pyhgnc update --help`
+Update options are available aswell, type `pyhgnc update --help` to get a full list with descriptions.
 
-Second option in your Python shell is ...
+To update from Python shell:
 
 .. code-block:: python
 

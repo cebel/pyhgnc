@@ -74,6 +74,7 @@ def main():
 @click.option('--hgnc_file_path', help="Load data from path HGNC")
 @click.option('--hcop_file_path', help="Load data from path HCOP")
 @click.option('-l', '--low_memory', help="set this if you have very low memory available", is_flag=True)
+@click.option('-f', '--force_download', help="Force the download of HGNC and HCOP files (replace previous downloads)", is_flag=True)
 def update(connection, silent, hgnc_file_path, hcop_file_path, low_memory):
     """Update the database"""
     database.update(connection=connection,
