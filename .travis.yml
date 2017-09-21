@@ -25,9 +25,9 @@ deploy:
   provider: pypi
   user: LeKono
   password:
-    secure: kKhTzcJrRI2hLAMCXDTPKoDatDxyM6NP+xVGG1e2pDkPbi/LO4zZhZXSuarHmHW5FtYsvT3EpXBoviv4WSRfYVWX5A4EAS6eRMvEopav6UKSc+/GTdAYvXOqJ6DiAKx1SFLpFl7EfQIC6X6hXLUv2AY19yeopgosxA9uRuvcVSQdyK6bVSdnYNIFpS/nY7rxhK9iioBhpWKs0OvKS09TAiyz66g/O0YEhIq//qXQGiigc9ZxFWDxT/BqOt5p/zEpDT0yxbq33+G09UXrfhGWwyHTvobP+b2m0EYTtgW20kzX6RoARBgNPbMrN0RhcvuvfByAcQL5o0X3bA+tQAs2sXbO1+PGh49cWjMDXqTwbz5owAQ9FMfmwCYIzMoJor6cjCJRWQnS3xxmT/tydZaJdvyNDk64qNbeqsqR681+doLgi0+3ltH64Cx98eji8e4GUZuVUU/uO+LJIf5AMAhSUVx+F1PTVqH0Lwo8i/OMju6ogvn6s4TwFPtPTPCiQkUtHYWbQw/bND3CM3gqfSD/60w7nHyY0NXiuIyiDdxzA8O6kkhTrXbJgLLVAEmO29xRnaGIhsPwAE7ineIk/lHL11ilOfkXW1yydk8RkDQZADdwl9LZEYW9IRBUfA1iKbLA6WacDgqtIVmCJQviqUu+4ve+lUGsvlNKcv/xuq9eWUs=
+    secure: H+WMtFRNBMRxpr1BsACyl/fVu88uDNB6Ia4qOWuNasW/VUXoGCvzknR4fXrreu4bxLU62PspbPl7tREdbXr1SEmia+OtPql0CUrwhI2NZ9sCr6f45d6g1X1BvogP6x7U7nPfXQMaOelhIUuXcLXLTxr+viTCyZY/ixtgNafIk0CelTcrSZ0DWqnmE/LirpH9HhWiuh+bTIHnuMLkZDA5SOJHRAhsve8tuaz0diZZk6FCYu8aAQ6RCPgIvk9fAod1B+Sn3U/zjqGkxo0Sxb0OosaGUsBCJ7Wj+Yh4ZZOJgf75SeN6JG3n2UlmA2M70S0CALV9Ahc0phN4/BqQ+bSy7QR7kfEsnwPUgt2ptxjRbUettJOtoanu8m4oYfWG9vqJ2Uug1XS/fDQl+cX1twZwkfXwDdSksg35kvEHze1zvysGSuFzBaBWiHHL/AFJj9qFfoSnXkfDxCcCj0NVSJM3W1Ei4k92gHqQ9khorVnn+iwh1jGNaGI2JWBPax54oKXBONTSoG5etalMeWRxHIUNmN701TvXnBqaE+T30uI9Lro67OfxRzVjA7IGinOI4H/C0/P6KzKjtm3yhri57V1e0P/wBWhwXqxk9Xa1Pa+i3FfDKUVTY7l1T5e19k/Z7Jl7sj3r3ZwhHw7Dc8cOe1pT66VBYeu/uybqscCIeQBRxo8=
   on:
-      tags: true
-      distributions: "sdist bdist_wheel"
-      repo: LeKono/pyhgnc
-      branch: master
+    tags: true
+    distributions: "sdist bdist_wheel"
+    repo: LeKono/pyhgnc
+    branch: master
