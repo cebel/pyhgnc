@@ -3,6 +3,8 @@ cache: pip
 language: python
 python:
 - 3.6
+- 3.5
+- 3.4
 - 2.7
 env:
   matrix:
@@ -19,3 +21,13 @@ install:
 - pip install codecov
 script:
 - tox
+deploy:
+  provider: pypi
+  user: LeKono
+  password:
+    secure: kKhTzcJrRI2hLAMCXDTPKoDatDxyM6NP+xVGG1e2pDkPbi/LO4zZhZXSuarHmHW5FtYsvT3EpXBoviv4WSRfYVWX5A4EAS6eRMvEopav6UKSc+/GTdAYvXOqJ6DiAKx1SFLpFl7EfQIC6X6hXLUv2AY19yeopgosxA9uRuvcVSQdyK6bVSdnYNIFpS/nY7rxhK9iioBhpWKs0OvKS09TAiyz66g/O0YEhIq//qXQGiigc9ZxFWDxT/BqOt5p/zEpDT0yxbq33+G09UXrfhGWwyHTvobP+b2m0EYTtgW20kzX6RoARBgNPbMrN0RhcvuvfByAcQL5o0X3bA+tQAs2sXbO1+PGh49cWjMDXqTwbz5owAQ9FMfmwCYIzMoJor6cjCJRWQnS3xxmT/tydZaJdvyNDk64qNbeqsqR681+doLgi0+3ltH64Cx98eji8e4GUZuVUU/uO+LJIf5AMAhSUVx+F1PTVqH0Lwo8i/OMju6ogvn6s4TwFPtPTPCiQkUtHYWbQw/bND3CM3gqfSD/60w7nHyY0NXiuIyiDdxzA8O6kkhTrXbJgLLVAEmO29xRnaGIhsPwAE7ineIk/lHL11ilOfkXW1yydk8RkDQZADdwl9LZEYW9IRBUfA1iKbLA6WacDgqtIVmCJQviqUu+4ve+lUGsvlNKcv/xuq9eWUs=
+  on:
+      tags: true
+      distributions: "sdist bdist_wheel"
+      repo: LeKono/pyhgnc
+      branch: master
