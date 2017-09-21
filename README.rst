@@ -17,7 +17,7 @@ PyHGNC is developed by the
 at the Fraunhofer Institute for Algorithms and Scientific Computing
 `SCAI <https://www.scai.fraunhofer.de/en.html>`_
 For more in for information about pyUniProt go to
-`the documentation <http://pyUniProt.readthedocs.io>`_.
+`the documentation <http://example.com`_.
 
 |er_model|
 
@@ -272,13 +272,13 @@ Universal Protein Resource (UniProt)
 PyHGNC
 
 - Documented on `Read the Docs <http://pyhgnc.readthedocs.io/>`_
-- Versioned on `GitHub <https://github.com/cebel/pyhgnc>`_
-- Tested on `Travis CI <https://travis-ci.org/cebel/pyhgnc>`_
+- Versioned on `GitHub <https://github.com/LeKono/pyhgnc>`_
+- Tested on `Travis CI <https://travis-ci.org/LeKono/pyhgnc>`_
 - Distributed by `PyPI <https://pypi.python.org/pypi/pyhgnc>`_
 - Chat on `Gitter <https://gitter.im/pyhgnc/Lobby>`_
 
-.. |stable_build| image:: https://travis-ci.org/cebel/pyUniProt.svg?branch=master
-    :target: https://travis-ci.org/cebel/pyhgnc
+.. |stable_build| image:: https://travis-ci.org/LeKono/pyhgnc.svg?branch=master
+    :target: https://travis-ci.org/LeKono/pyhgnc
     :alt: Stable Build Status
 
 .. |stable_documentation| image:: https://readthedocs.org/projects/pyUniProt/badge/?version=latest
