@@ -24,7 +24,7 @@ script:
 deploy:
   # test-pypi
   provider: pypi
-  distributions: sdist
+  distributions: "sdist bdist_wheel"
   server: https://testpypi.python.org/pypi
   user: "LeKono"
   password:
