@@ -16,8 +16,8 @@ PyHGNC is developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
 `SCAI <https://www.scai.fraunhofer.de/en.html>`_
-For more in for information about pyUniProt go to
-`the documentation <http://example.com`_.
+For more in for information about PyHGNC go to
+`the documentation <http://pyhgnc.readthedocs.io/en/latest/index.html>`_.
 
 |er_model|
 
@@ -36,12 +36,12 @@ Supported databases
 possibility to install software on your system SQLite - which needs no further
 installation - also works. Following RDMSs are supported (by SQLAlchemy):
 
-1. Firebird
-2. Microsoft SQL Server
-3. MySQL / `MariaDB <https://mariadb.org/>`_
-4. Oracle
-5. PostgreSQL
-6. SQLite
+1. `Firebird <https://www.firebirdsql.org/en/start/>`_
+2. `Microsoft SQL Server <https://www.microsoft.com/en-us/sql-server/>`_
+3. `MySQL <https://www.mysql.com/>`_ / `MariaDB <https://mariadb.org/>`_
+4. `Oracle <https://www.oracle.com/database/index.html>`_
+5. `PostgreSQL <https://www.postgresql.org/>`_
+6. `SQLite <https://www.sqlite.org/>`_
 7. Sybase
 
 Getting Started
