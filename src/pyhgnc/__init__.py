@@ -9,12 +9,11 @@ Installation
 
 .. code-block:: sh
 
-   $ git clone https://gitlab.scai.fraunhofer.de/andrej.konotopez/pyhgnc.git
+   $ git clone https://github.com/LeKono/pyhgnc.git
    $ cd pyhgnc
-   $ pip3 install -e .
+   $ pip3 install pyhgnc
 """
 
-# ToDo: Make all the imports!
 from .manager.query import QueryManager
 from .manager.database import update
 
@@ -22,13 +21,13 @@ query = QueryManager
 
 __all__ = ['update', 'query']
 
-__version__ = '0.1.0-dev'
+__version__ = '0.1.0'
 
 __title__ = 'PyHGNC'
 __description__ = 'Importing and querying HGNC data'
-__url__ = 'https://gitlab.scai.fraunhofer.de/andrej.konotopez/pyhgnc.git'
+__url__ = 'https://github.com/LeKono/pyhgnc.git'
 
-__author__ = 'Andrej Konotopez'
+__author__ = 'Christian Ebeling & Andrej Konotopez'
 __email__ = 'Andrej.Konotopez@scai.fraunhofer.de'
 
 __license__ = 'Apache 2.0 License'
