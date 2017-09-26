@@ -233,7 +233,7 @@ PyHGNC
 .. |pypi_version| image:: https://img.shields.io/pypi/v/PyHGNC.svg
     :alt: Current version on PyPI
 
-.. |phago_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/phago_logo.jpeg
+.. |phago_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/phago_logo.png
     :target: https://www.imi.europa.eu/content/phago
     :alt: PHAGO project logo
 
@@ -245,7 +245,7 @@ PyHGNC
     :target: https://www.imi.europa.eu/
     :alt: IMI project logo
 
-.. |scai_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/scai-logo.png
+.. |scai_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/scai_logo.png
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
