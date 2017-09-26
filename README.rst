@@ -281,7 +281,7 @@ PyHGNC
     :target: https://travis-ci.org/LeKono/pyhgnc
     :alt: Stable Build Status
 
-.. |stable_documentation| image:: https://readthedocs.org/projects/pyUniProt/badge/?version=latest
+.. |stable_documentation| image:: https://readthedocs.org/projects/pyhgnc/badge/?version=latest
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Development Documentation Status
 
@@ -314,5 +314,5 @@ PyHGNC
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Entity relationship model
 
-.. |project_logo_large| image:: ./docs/source/_static/logos/project_logo_large.png
+.. |project_logo_large| image:: https://github.com/LeKono/pyhgnc/blob/master/docs/source/_static/logos/project_logo_large.png
     :alt: Project logo
