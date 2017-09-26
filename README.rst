@@ -164,6 +164,7 @@ Updating
 The updating process will download the complete HGNC json file and the HCOP file.
 
 .. code-block:: python
+
     import pyhgnc
     pyhgnc.manager.database.update()
 
@@ -171,6 +172,7 @@ This will use either the default connection settings of PyHGNC or the settings d
 It is also possible to run the update process from shell.
 
 .. code-block:: sh
+
     pyhgnc update
 
 Quick start with query functions
