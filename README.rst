@@ -1,5 +1,5 @@
 PyHGNC |stable_build|
-========================
+=====================
 
 |project_logo_large|
 
