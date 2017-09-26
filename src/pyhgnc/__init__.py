@@ -21,7 +21,7 @@ query = QueryManager
 
 __all__ = ['update', 'query']
 
-__version__ = '0.2.0-dev'
+__version__ = '0.2.0'
 
 __title__ = 'PyHGNC'
 __description__ = 'Importing and querying HGNC data'
