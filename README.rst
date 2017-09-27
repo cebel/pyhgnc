@@ -1,7 +1,5 @@
-|project_logo_large| |stable_build|
-===================================
-
-|stable_documentation| |pypi_license|
+|project_logo_large| |stable_build| |stable_documentation| |pypi_license|
+=========================================================================
 
 `PyHGNC <http://pyHGNC.readthedocs.io>`_ is a Python package
 to access and query data provided by HGNC-approved gene nomenclature, gene families and associated resources 
@@ -247,7 +245,7 @@ PyHGNC
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
-.. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/models/all.png
+.. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/develop/docs/source/_static/models/all.png
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Entity relationship model
 
