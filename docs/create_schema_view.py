@@ -2,8 +2,6 @@ import codecs
 import sadisplay
 from pyhgnc.manager.database import models
 import os
-import sqlalchemy
-import inspect
 
 base_folder = './source/_static/models/'
 
