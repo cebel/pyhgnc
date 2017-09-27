@@ -52,15 +52,15 @@ ToDo: Add Figure of PyHGNC ER
 
 - supported by `IMI <https://www.imi.europa.eu/>`_, `AETIONOMY <http://www.aetionomy.eu/>`_, `PHAGO <https://www.imi.europa.eu/content/phago>`_.
 
-.. image:: _static/logos/imi-logo.png
+.. image:: _static/logos/imi_logo.png
    :width: 150 px
    :target: pageapplet/index.html
 
-.. image:: _static/logos/aetionomy-logo.png
+.. image:: _static/logos/aetionomy_logo.png
    :width: 150 px
    :target: pageapplet/index.html
 
-.. image:: _static/logos/scai-logo.svg
+.. image:: _static/logos/scai_logo.svg
    :width: 150 px
    :target: pageapplet/index.html
 
