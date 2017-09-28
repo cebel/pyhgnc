@@ -249,7 +249,7 @@ PyHGNC
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
-.. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/develop/docs/source/_static/models/all.png
+.. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/models/all.png
     :width: 750px
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Entity relationship model
