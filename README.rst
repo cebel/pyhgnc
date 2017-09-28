@@ -230,22 +230,27 @@ PyHGNC
     :alt: Current version on PyPI
 
 .. |phago_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/phago_logo.png
+    :width: 150px
     :target: https://www.imi.europa.eu/content/phago
     :alt: PHAGO project logo
 
 .. |aetionomy_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/aetionomy_logo.png
+    :width: 150px
     :target: http://www.aetionomy.eu/en/vision.html
     :alt: AETIONOMY project logo
 
 .. |imi_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/imi_logo.png
+    :width: 150px
     :target: https://www.imi.europa.eu/
     :alt: IMI project logo
 
 .. |scai_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/scai_logo.png
+    :width: 150px
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
 .. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/develop/docs/source/_static/models/all.png
+    :width: 750px
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Entity relationship model
 
