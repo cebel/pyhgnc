@@ -399,7 +399,7 @@ class DbManager(BaseDbManager):
                 log.info('loading json data from {}'.format(hgnc_file_path))
                 hgnc_dict = json.loads(response.read())
         else:
-            response = request.urlopen(HGNC_JSON)
+            response = urlopen(HGNC_JSON)
             hgnc_dict = json.loads(response.read().decode())
 
         return hgnc_dict['response']
