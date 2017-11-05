@@ -267,7 +267,7 @@ class QueryManager(BaseDbManager):
         :return:
             - if `as_df == False` -> list(:class:`.models.Keyword`)
             - if `as_df == True`  -> :class:`pandas.DataFrame`
-        :rtype: list(:class:`.models.Keyword`) or :class:`pandas.DataFrame`
+        :rtype: list[models.HGNC]
         """
         q = self.session.query(models.HGNC)
 
