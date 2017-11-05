@@ -1,8 +1,11 @@
-from .database import BaseDbManager
+# -*- coding: utf-8 -*-
+
 from collections import Iterable
+
 from pandas import read_sql
+
 from . import models
-import sqlalchemy
+from .database import BaseDbManager
 
 
 class QueryManager(BaseDbManager):
