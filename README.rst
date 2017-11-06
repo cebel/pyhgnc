@@ -1,9 +1,5 @@
-PyHGNC |stable_build|
-========================
-
-|project_logo_large|
-
-|stable_documentation| |pypi_license|
+|project_logo_large| |stable_build| |stable_documentation| |pypi_license|
+=========================================================================
 
 `PyHGNC <http://pyHGNC.readthedocs.io>`_ is a Python package
 to access and query data provided by HGNC-approved gene nomenclature, gene families and associated resources 
@@ -16,8 +12,8 @@ PyHGNC is developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
 `SCAI <https://www.scai.fraunhofer.de/en.html>`_
-For more in for information about pyUniProt go to
-`the documentation <http://pyUniProt.readthedocs.io>`_.
+For more in for information about PyHGNC go to
+`the documentation <http://pyhgnc.readthedocs.io/en/latest/index.html>`_.
 
 |er_model|
 
@@ -36,20 +32,22 @@ Supported databases
 possibility to install software on your system SQLite - which needs no further
 installation - also works. Following RDMSs are supported (by SQLAlchemy):
 
-1. Firebird
-2. Microsoft SQL Server
-3. MySQL / `MariaDB <https://mariadb.org/>`_
-4. Oracle
-5. PostgreSQL
-6. SQLite
+1. `Firebird <https://www.firebirdsql.org/en/start/>`_
+2. `Microsoft SQL Server <https://www.microsoft.com/en-us/sql-server/>`_
+3. `MySQL <https://www.mysql.com/>`_ / `MariaDB <https://mariadb.org/>`_
+4. `Oracle <https://www.oracle.com/database/index.html>`_
+5. `PostgreSQL <https://www.postgresql.org/>`_
+6. `SQLite <https://www.sqlite.org/>`_
 7. Sybase
 
 Getting Started
 ---------------
 This is a quick start tutorial for impatient.
 
-Installation |pypi_version| |python_versions|
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installation
+~~~~~~~~~~~~
+|pypi_version| |python_versions|
+
 PyHGNC can be installed with `pip <https://pip.pypa.io/en/stable/>`_.
 
 .. code-block:: bash
@@ -115,7 +113,7 @@ something like this
     character set [utf8]:
 
 Connection will be tested and in case of success return `Connection was successful`.
-Otherwise you will see following hinte
+Otherwise you will see following hint
 
 .. code-block:: sh
 
@@ -159,50 +157,19 @@ If you have used you own settings, please adapt the following command to you req
 
 Updating
 ~~~~~~~~
-The updating process will download all HGNC files
-
-.. warning::
-
-    Please note that UniProt download file needs ~700 Mb of disk space and the update takes ~2h only for
-    human, mouse and rat (depending on your computer)
-
-It is strongly recommended to restrict the entries liked to specific organisms your are interested in by parsing a list
-of NCBI Taxonomy IDs to the parameter `taxids`. To identify correct NCBI Taxonomy IDs please go to
-`NCBI Taxonomy web form <https://www.ncbi.nlm.nih.gov/taxonomy/>`_. In the following example we use 9606 as identifier
-for Homo sapiens, 10090 for Mus musculus and 10116 for Rattus norvegicus.
-
-There are two options to import the data:
-
-1. Command line import
-
-    .. code-block:: sh
-
-        pyhgnc update --taxids 9606,10090,10116
-
-2. Python
-
-    .. code-block:: python
-
-        import pyhgnc
-        pyhgnc.update(taxids=[9606, 10090, 10116])
-
-We only recommend to import the whole UniProt dataset if you don't want to restrict your search. Import with no
-restrictions will take several hours and take a lot of disk space.
-
-If you want to load all UniProt entries in the database:
+The updating process will download the complete HGNC json file and the HCOP file.
 
 .. code-block:: python
 
     import pyhgnc
-    pyhgnc.update() # not recommended, please read the notes above
+    pyhgnc.manager.database.update()
 
-The update uses the download file if it still exists on you system (~/.pyhgnc/data/uniprot_sprot.xml.gz). If you use
-the parameter `force_download` the current file from UniProt will be downloaded.
+This will use either the default connection settings of PyHGNC or the settings defined by the user.
+It is also possible to run the update process from shell.
 
-.. code-block:: python
+.. code-block:: sh
 
-    import pyhgnc
-    pyhgnc.update(force_download=True, taxids=[9606, 10090, 10116])
+    pyhgnc update
 
 Quick start with query functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,76 +179,44 @@ Initialize the query object
 
     query = pyhgnc.query()
 
-Get all entries
+Get all HGNC entries:
 
 .. code-block:: python
 
-    all_entries = query.entry()
+    all_entries = query.hgnc()
 
-
-Use parameters like gene_name to find specific entries
-
-.. code-block:: python
-
-    >>> entry = query.entry(gene_name='YWHAE', taxid=9606, recommended_short_name='14-3-3E', name='1433E_HUMAN')[0]
-    >>> entry
-    14-3-3 protein epsilon
-
-Entry is the root element in the database. Form here you can reach all other data
-    >>> entry.accessions
-    [P62258, B3KY71, D3DTH5, P29360, P42655, Q4VJB6, Q53XZ5, Q63631, Q7M4R4]
-    >>> entry.functions
-    ["Adapter protein implicated in the regulation of a large spectrum of both ..."]
-
-If a parameter ends on a **s** you can search
-    >>> alcohol_dehydrogenases = q.entry(ec_numbers='1.1.1.1')
-    >>> [x.name for x in q.get_entry(ec_numbers='1.1.1.1')]
-    ['ADHX_RAT', 'ADH1_RAT', 'ADHX_HUMAN', 'ADHX_MOUSE']
-    >>> query.entry(ec_numbers=('1.1.1.1', '1.1.1.2'))
-    ['Adh5', 'Adh1', 'ADH5', 'Adh5', 'Adh6', 'ADH7', 'Adh7', 'Adh7', 'Adh1']
-
-As dataframe with a limit of 10 and accession number starts with Q9 (% used as wildcard)
-
-.. code-block:: python
-
-    >>> query.accession(as_df=True, limit=3, accession='Q9%')
-       id accession  entry_id
-    0   1    Q9CQV8         1
-    1  32    Q9GIK8         6
-    2  33    Q9TQB4         6
-
-
+.. hint::
+    Check out the documentation: Query functions section for more examples and check out the Query section for
+    all possible parameters for the different models.
 
 More information
 ----------------
 See the `installation documentation <http://pyhgnc.readthedocs.io/en/latest/installation.html>`_ for more advanced
 instructions. Also, check the change log at :code:`CHANGELOG.rst`.
 
-UniProt tools and licence (use of data)
----------------------------------------
-UniProt provides also many online `query interfaces <http://www.uniprot.org>`_ on their website.
-
-Please be aware of the `UniProt licence <http://www.uniprot.org/help/license>`_.
+HGNC tools
+----------
+HGNC provides also `online tools <http://www.genenames.org/tools/all>`_ .
 
 Links
 -----
-Universal Protein Resource (UniProt)
+HUGO Gene Nomenclature Committee (HGNC)
 
 - `HGNC website <http://www.genenames.org/>`_
 
 PyHGNC
 
 - Documented on `Read the Docs <http://pyhgnc.readthedocs.io/>`_
-- Versioned on `GitHub <https://github.com/cebel/pyhgnc>`_
-- Tested on `Travis CI <https://travis-ci.org/cebel/pyhgnc>`_
+- Versioned on `GitHub <https://github.com/LeKono/pyhgnc>`_
+- Tested on `Travis CI <https://travis-ci.org/LeKono/pyhgnc>`_
 - Distributed by `PyPI <https://pypi.python.org/pypi/pyhgnc>`_
 - Chat on `Gitter <https://gitter.im/pyhgnc/Lobby>`_
 
-.. |stable_build| image:: https://travis-ci.org/cebel/pyUniProt.svg?branch=master
-    :target: https://travis-ci.org/cebel/pyhgnc
+.. |stable_build| image:: https://travis-ci.org/LeKono/pyhgnc.svg?branch=master
+    :target: https://travis-ci.org/LeKono/pyhgnc
     :alt: Stable Build Status
 
-.. |stable_documentation| image:: https://readthedocs.org/projects/pyUniProt/badge/?version=latest
+.. |stable_documentation| image:: https://readthedocs.org/projects/pyhgnc/badge/?version=latest
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Development Documentation Status
 
@@ -294,25 +229,30 @@ PyHGNC
 .. |pypi_version| image:: https://img.shields.io/pypi/v/PyHGNC.svg
     :alt: Current version on PyPI
 
-.. |phago_logo| image:: https://raw.githubusercontent.com/cebel/pyhgnc/master/docs/source/_static/logos/phago_logo.jpeg
+.. |phago_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/phago_logo.png
+    :width: 150px
     :target: https://www.imi.europa.eu/content/phago
     :alt: PHAGO project logo
 
-.. |aetionomy_logo| image:: https://raw.githubusercontent.com/cebel/pyhgnc/master/docs/source/_static/logos/aetionomy_logo.png
+.. |aetionomy_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/aetionomy_logo.png
+    :width: 150px
     :target: http://www.aetionomy.eu/en/vision.html
     :alt: AETIONOMY project logo
 
-.. |imi_logo| image:: https://raw.githubusercontent.com/cebel/pyhgnc/master/docs/source/_static/logos/imi_logo.png
+.. |imi_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/imi_logo.png
+    :width: 150px
     :target: https://www.imi.europa.eu/
     :alt: IMI project logo
 
-.. |scai_logo| image:: https://raw.githubusercontent.com/cebel/pyhgnc/master/docs/source/_static/logos/scai_logo.png
+.. |scai_logo| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/scai_logo.png
+    :width: 150px
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
-.. |er_model| image:: http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/256/Status-image-missing-icon.png
+.. |er_model| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/develop/docs/source/_static/models/all_small.png
+    :width: 750px
     :target: http://pyhgnc.readthedocs.io/en/latest/
     :alt: Entity relationship model
 
-.. |project_logo_large| image:: ./docs/source/_static/logos/project_logo_large.png
+.. |project_logo_large| image:: https://raw.githubusercontent.com/LeKono/pyhgnc/master/docs/source/_static/logos/project_logo_large.png
     :alt: Project logo

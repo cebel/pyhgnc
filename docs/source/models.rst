@@ -6,8 +6,7 @@ You can use an instance of :class:`pyhgnc.manager.query.QueryManager` to query t
 
 Entity–relationship model:
 
-.. image:: _static/models/all.png
-    :target: _images/all.png
+ToDo: Add ER figure here!
 
 
 .. contents::

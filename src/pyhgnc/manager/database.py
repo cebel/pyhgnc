@@ -2,6 +2,7 @@
 """PyHGNC loads HGNC contant into a relational database and provides a RESTFull API."""
 
 import os
+import sys
 import time
 import logging
 import json
@@ -12,7 +13,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, load_only
 
 from tqdm import tqdm
-from urllib import request
+if sys.version_info[0] == 3:
+    from urllib.request import urlopen
+else:
+    from urllib import urlopen
+
 from datetime import datetime
 
 from configparser import RawConfigParser, ConfigParser

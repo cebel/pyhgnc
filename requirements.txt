@@ -3,7 +3,7 @@ configparser
 pymysql
 tqdm
 click
-pandas
+pandas>=0.20.3
 flasgger
 flask
 passlib

@@ -3,6 +3,8 @@ cache: pip
 language: python
 python:
 - 3.6
+- 3.5
+- 3.4
 - 2.7
 env:
   matrix:
@@ -19,3 +21,15 @@ install:
 - pip install codecov
 script:
 - tox
+deploy:
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  # For testing on Test-PyPI
+  #server: https://test.pypi.org/legacy/
+  user: "LeKono"
+  password:
+    secure: "g1HyT+YLFZnpAiyEuLQaYbQ+VsiArOJYGcp/vr1zhhqEfhJRdXFPamnbnA8tAoc0FAFYbnPr9s666T+ZASpYOnxo840rDEZnIXP3M2ifewm/ABbv1A0qGm6RcDbh3UU0J47Kcdge6Wm2u37cgbez+oofguU+hRhEN+WQ4qv0vj1+nZY3JWedG7KHlo1Y6pLb0YPfCwbMgvEnRQRDIszDgCn2/oOgN5b14yoHCLBhwvaOsEDFaHxwpC1gnAViLmxFudhTUQ6BfJCuQupZkxnn6yr1gFwVXy9TXoRPTTEQ4Unft/oaNSJHvE104j5oPdKhWYVZA91nS1TDwELJ5lpZ6RO7k387fRO/ORbXhVlI3SShTt710qkmzvzfr+LDeKf119/PcliX+YRZ8Va3ZRzp/94qsTcIBBGu0g9l+KjEYRiAPAh1Mu6WtvF8HDgxhbjah/EozqXzIYvgY/q71895LXLxNYbBeoaKXNUdroURiTPiwThTCHbE5DWJ8gBeEx2R46aWvWA74p9RS1I8PHc8QLM3kVVWR73RYNACMqY7/orq+j7ovwwy+r8lr9tL1pomzN06nqh39jFVcoRkEBwGmrAQEwenhqP646RL+P5TSxLhBMxBAYriZPa3Hau7UIiYVIP73foNRLqLHNzu7ZY3XQHn5wPqpHXYIzBG8h/braI="
+  on:
+    #tags: false
+    tags: true
+    branch: master

@@ -16,7 +16,7 @@ from pyhgnc.manager.query import QueryManager
 
 log = logging.getLogger(__name__)
 
-
+# ToDo: more in depth tests
 class TestQuery(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
