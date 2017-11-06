@@ -72,6 +72,7 @@ setup(
     keywords=KEYWORDS,
     license=find_meta('license'),
     packages=PACKAGES,
+    include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     package_dir={'': 'src'},
     classifiers=[
