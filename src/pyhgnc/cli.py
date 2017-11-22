@@ -116,6 +116,7 @@ def mysql(host, user, passwd, db, charset):
 @click.option('-p', '--port', type=int, help='Flask port. Defaults to 5000')
 def web(host, port):
     """Start web application"""
+    click.echo("Trying to start server on {host}:{port}".format(host=host, port=port if port else 5000))
     get_app().run(host=host, port=port)
 
 
