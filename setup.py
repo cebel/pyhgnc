@@ -75,6 +75,10 @@ setup(
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     package_dir={'': 'src'},
+    package_data={'': [
+        'pyhgnc/webserver/*.html',
+        'pyhgnc/webserver/*.png',
+    ]},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
