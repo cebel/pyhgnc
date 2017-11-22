@@ -16,6 +16,7 @@ matrix:
     env: TOXENV=manifest
   allow_failures:
   - python: 2.7
+  - python: 3.4
 install:
 - pip install tox
 - pip install codecov
