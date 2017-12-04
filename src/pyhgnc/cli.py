@@ -126,7 +126,7 @@ def getcon():
     click.echo(database.BaseDbManager.get_connection_string())
 
 
-@main.group(help="PyBEL Data Manager Utilities")
+@main.group(help="PyHGNC Data Manager Utilities")
 def manage():
     pass
 
