@@ -107,3 +107,4 @@ ENV/
 # docs
 docs/build/
 docs/build/*
+.vscode/settings.json
