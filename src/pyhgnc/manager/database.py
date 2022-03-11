@@ -2,6 +2,7 @@
 """PyHGNC loads HGNC contant into a relational database and provides a RESTFull API."""
 
 import os
+import re
 import sys
 import time
 import logging
@@ -186,17 +187,19 @@ class DbManager(BaseDbManager):
 
     def get_mgds(self, hgnc):
         mgds = []
+        regex_mgdid = re.compile("MGI:(?P<mgdid>\d+)")
 
         if 'mgd_id' in hgnc:
 
             for mgd in hgnc['mgd_id']:
 
-                if mgd not in self.mgds:
-                    mgdid = int(mgd.split(':')[-1])
-                    self.mgds[mgd] = models.MGD(mgdid=mgdid)
+                mgdid_found = regex_mgdid.search(mgd)
 
-                mgds.append(self.mgds[mgd])
-
+                if mgd not in self.mgds and mgdid_found:
+                    mgdid = mgdid_found.groupdict()['mgdid']
+                    self.mgds[mgd] = models.MGD(mgdid=int(mgdid))
+                if mgdid_found:
+                    mgds.append(self.mgds[mgd])
         return mgds
 
     def get_rgds(self, hgnc):
